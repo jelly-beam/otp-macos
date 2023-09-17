@@ -77,8 +77,6 @@ release_prepare
 echo "::endgroup::"
 
 _releases_update() {
-    #!/bin/bash
-
     filename_no_ext="macos64-${macos_vsn}-OTP-${global_OTP_VSN}"
 
     crc32=$(crc32 "$INSTALL_DIR"/"$filename_no_ext.tar.gz")
