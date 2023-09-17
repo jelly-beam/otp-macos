@@ -30,7 +30,7 @@ of the assets consistent as to ease use in CI pipelines.
 File `_RELEASES` will contain the available `.tar.gz` packages, as well as the execution of
 `crc32` on them and a date (of approximately when the build was finished), in the following format:
 
-```
+```plain
 <OTP-vsn> <crc32_for_tar_gz> <date_as_utc_%Y-%m-%dT%H:%M:%SZ>
 ```
 
