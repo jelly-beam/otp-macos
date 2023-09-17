@@ -14,6 +14,7 @@ jobs:
 
       # uses .markdownlint.yml for configuration
       - name: markdownlint
+        # yamllint disable-line rule:line-length
         uses: DavidAnson/markdownlint-cli2-action@3aaa38e446fbd2c288af4291aa0f55d64651050f  # v12.0.0
         with:
           globs: |
