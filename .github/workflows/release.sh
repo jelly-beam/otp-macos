@@ -69,13 +69,13 @@ echo "::group::Kerl: test build result"
 kerl_test
 echo "::endgroup::"
 
-tar_archive() {
+release_prepare() {
     file="macos64-${macos_vsn}-OTP-${OTP_VSN}.tar.gz"
     tar -vzcf "$file" ./*
     shasum -a 256  "$file" > "${macos_vsn}-OTP-${OTP_VSN}-sha256.txt"
 }
-echo "::group::tar: archive"
-tar_archive
+echo "::group::Release: prepare"
+release_prepare
 echo "::endgroup::"
 
 echo "otp_vsn=${OTP_VSN}" >>"$GITHUB_OUTPUT"
