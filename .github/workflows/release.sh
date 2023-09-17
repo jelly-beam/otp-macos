@@ -77,27 +77,27 @@ release_prepare
 echo "::endgroup::"
 
 _releases_update() {
-    filename_no_ext="macos64-${macos_vsn}-OTP-${global_OTP_VSN}"
+    if [ "$GITHUB_REF" == "refs/heads/main" ]; then
+        filename_no_ext="macos64-${macos_vsn}-OTP-${global_OTP_VSN}"
 
-    crc32=$(crc32 "$INSTALL_DIR"/"$filename_no_ext.tar.gz")
-    date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-    echo "$filename_no_ext $crc32 $date" >>_RELEASES
+        crc32=$(crc32 "$INSTALL_DIR"/"$filename_no_ext.tar.gz")
+        date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        echo "$filename_no_ext $crc32 $date" >>_RELEASES
 
-    sort -o _RELEASES _RELEASES
+        sort -o _RELEASES _RELEASES
 
-    git config user.name "GitHub Actions"
-    git config user.email "actions@user.noreply.github.com"
-    git add _RELEASES
-    git commit -m "Update _RELEASES: $filename_no_ext"
-    git push origin "$GITHUB_REF_NAME"
+        git config user.name "GitHub Actions"
+        git config user.email "actions@user.noreply.github.com"
+        git add _RELEASES
+        git commit -m "Update _RELEASES: $filename_no_ext"
+        git push origin "$GITHUB_REF_NAME"
 
-    target_commitish=$(git log -n 1 --pretty=format:"%H")
-    echo "target_commitish=$target_commitish" >>"$GITHUB_OUTPUT"
+        target_commitish=$(git log -n 1 --pretty=format:"%H")
+        echo "target_commitish=$target_commitish" >>"$GITHUB_OUTPUT"
+    fi
 }
 echo "::group::_RELEASES: update"
-if [ "$GITHUB_REF" == "refs/heads/main" ]; then
-    _releases_update
-fi
+_releases_update
 echo "::endgroup::"
 
 echo "otp_vsn=$global_OTP_VSN" >>"$GITHUB_OUTPUT"
