@@ -33,13 +33,6 @@ jobs:
         run: |
           ./.github/workflows/release.sh ${{matrix.macos-vsn}}
 
-      - name: Update _RELEASES
-        id: update_releases
-        run: |
-          filename_no_ext="macos64-${{matrix.macos-vsn}}-OTP-${{steps.config_build.outputs.otp_vsn}}"
-          ./.github/workflows/update__releases.sh "$filename_no_ext"
-        if: ${{github.ref == 'refs/heads/main'}}
-
       - name: Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844  # v1
         with:

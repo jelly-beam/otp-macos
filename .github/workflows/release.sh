@@ -98,7 +98,9 @@ _releases_update() {
     echo "target_commitish=$target_commitish" >>"$GITHUB_OUTPUT"
 }
 echo "::group::_RELEASES: update"
-_releases_update
+if [ "$GITHUB_REF" == "refs/heads/main" ]; then
+    _releases_update
+fi
 echo "::endgroup::"
 
 echo "otp_vsn=$OTP_VSN" >>"$GITHUB_OUTPUT"
