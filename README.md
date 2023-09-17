@@ -22,7 +22,7 @@ The images are built with documentation chunks as per `make docs DOC_TARGETS=chu
 
 ### Releases
 
-Releases are tagged as `macos-${macos_vsn}-OTP-${otp_vsn}`, and available at
+Releases are tagged as `macos-${macos_vsn}/OTP-${otp_vsn}`, and available at
 <https://github.com/jelly-beam/otp-macos/releases/> under section Assets. We aim to keep naming
 of the assets consistent as to ease use in CI pipelines.
 
