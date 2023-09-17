@@ -2,31 +2,50 @@
 
 macos_vsn=$1
 
-INSTALL_DIR=$RUNNER_TEMP/otp
+global_INSTALL_DIR=$RUNNER_TEMP/otp
 
-echo_pwd() {
-    echo "pwd: $PWD"
+# Helper functions
+
+cd_install_dir() {
+    cd "$global_INSTALL_DIR" || exit
 }
 
+set_initial_dir() {
+    global_BASE_DIR="$PWD"
+}
+
+cd_initial_dir() {
+    cd "$global_BASE_DIR" || exit
+}
+
+set_kerl_dir() {
+    global_KERL_DIR="$PWD"
+}
+
+cd_kerl_dir() {
+    cd "$global_KERL_DIR" || exit
+}
+
+# Workflow groups
+
 homebrew_install() {
-    echo_pwd
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 }
 echo "::group::Homebrew: install"
 homebrew_install
+set_initial_dir
 echo "::endgroup::"
 
 kerl_checkout() {
-    echo_pwd
     git clone https://github.com/kerl/kerl
     cd kerl || exit
 }
 echo "::group::kerl: checkout"
 kerl_checkout
+set_kerl_dir
 echo "::endgroup::"
 
 kerl_configure() {
-    echo_pwd
     ./kerl update releases
     MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
     export MAKEFLAGS
@@ -35,11 +54,11 @@ kerl_configure() {
     echo "OpenSSL is $(openssl version)"
 }
 echo "::group::kerl: configure"
+cd_kerl_dir
 kerl_configure
 echo "::endgroup::"
 
 pick_otp_vsn() {
-    echo_pwd
     global_OTP_VSN=undefined
     while read -r release; do
         if git show-ref --tags --verify --quiet "refs/tags/macos64-${macos_vsn}-OTP-${release}"; then
@@ -56,39 +75,38 @@ pick_otp_vsn() {
     echo "  picked OTP $global_OTP_VSN"
 }
 echo "::group::Erlang/OTP: pick version to build"
+cd_kerl_dir
 pick_otp_vsn
 echo "::endgroup::"
 
 kerl_build_install() {
-    echo_pwd
     KERL_DEBUG=true ./kerl build-install "$global_OTP_VSN" "$global_OTP_VSN" "$INSTALL_DIR"
 }
 echo "::group::kerl: build-install"
+cd_kerl_dir
 kerl_build_install
 echo "::endgroup::"
 
 kerl_test() {
-    echo_pwd
-    cd "$INSTALL_DIR" || exit
     ./bin/erl -s crypto -s init stop
     ./bin/erl_call
 }
 echo "::group::kerl: test build result"
+cd_install_dir
 kerl_test
 echo "::endgroup::"
 
 release_prepare() {
-    echo_pwd
     file="macos64-${macos_vsn}-OTP-${global_OTP_VSN}.tar.gz"
     tar -vzcf "$file" ./*
     shasum -a 256 "$file" >"macos64-${macos_vsn}-OTP-${global_OTP_VSN}.sha256.txt"
 }
 echo "::group::Release: prepare"
+cd_install_dir
 release_prepare
 echo "::endgroup::"
 
 _releases_update() {
-    echo_pwd
     if [ "$GITHUB_REF" == "refs/heads/main" ]; then
         filename_no_ext="macos64-${macos_vsn}-OTP-${global_OTP_VSN}"
 
@@ -108,11 +126,12 @@ _releases_update() {
     fi
 }
 echo "::group::_RELEASES: update"
+cd_initial_dir
 _releases_update
 echo "::endgroup::"
 
 config_build_outputs() {
-    echo_pwd
+    cd "$global_BASE_DIR" || exit
     {
         echo "otp_vsn=$global_OTP_VSN"
         echo "tar_gz=${INSTALL_DIR}/macos64-${macos_vsn}-OTP-${global_OTP_VSN}.tar.gz"
@@ -121,5 +140,6 @@ config_build_outputs() {
     } >>"$GITHUB_OUTPUT"
 }
 echo "::group::Configure and build: outputs"
+cd_initial_dir
 config_build_outputs
 echo "::endgroup::"
