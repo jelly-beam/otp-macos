@@ -91,13 +91,20 @@ _releases_update() {
         git add _RELEASES
         git commit -m "Update _RELEASES: $filename_no_ext"
         git push origin "$GITHUB_REF_NAME"
-
-        target_commitish=$(git log -n 1 --pretty=format:"%H")
-        echo "target_commitish=$target_commitish" >>"$GITHUB_OUTPUT"
     fi
 }
 echo "::group::_RELEASES: update"
 _releases_update
 echo "::endgroup::"
 
-echo "otp_vsn=$global_OTP_VSN" >>"$GITHUB_OUTPUT"
+config_build_outputs() {
+    {
+        echo "otp_vsn=$global_OTP_VSN"
+        echo "tar_gz=${INSTALL_DIR}/macos64-${macos_vsn}-OTP-${global_OTP_VSN}.tar.gz"
+        echo "sha256_txt=${INSTALL_DIR}/macos64-${macos_vsn}-OTP-${global_OTP_VSN}.sha256.txt"
+        echo "target_commitish=$(git log -n 1 --pretty=format:"%H")"
+    } >>"$GITHUB_OUTPUT"
+}
+echo "::group::Configure and build: outputs"
+config_build_outputs
+echo "::endgroup::"

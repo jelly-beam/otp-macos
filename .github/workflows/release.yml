@@ -42,8 +42,8 @@ jobs:
             macOS ${{matrix.macos-vsn}} (64 bit).
           fail_on_unmatched_files: true
           files: |
-            ${{runner.temp}}/otp/macos64-${{matrix.macos-vsn}}-OTP-${{steps.config_build.outputs.otp_vsn}}.tar.gz
-            ${{runner.temp}}/otp/macos64-${{matrix.macos-vsn}}-OTP-${{steps.config_build.outputs.otp_vsn}}.sha256.txt
+            ${{steps.config_build.outputs.tar_gz}}
+            ${{steps.config_build.outputs.sha256_txt}}
           tag_name: macos64-${{matrix.macos-vsn}}/OTP-${{steps.config_build.outputs.otp_vsn}}
           target_commitish: ${{steps.config_build.outputs.target_commitish}}
         if: ${{github.ref == 'refs/heads/main'}}
