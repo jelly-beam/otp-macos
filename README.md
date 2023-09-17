@@ -3,18 +3,19 @@
 [release]: https://github.com/jelly-beam/otp-macos/actions/workflows/release.yml
 [release-img]: https://github.com/jelly-beam/otp-macos/actions/workflows/release.yml/badge.svg
 
-`otp-macos` is a living, and up-to-date, collection of pre-compiled macOS-ready Erlang/OTP versions.
+`otp-macos` is a living, and up-to-date, collection of precompiled macOS-ready Erlang/OTP versions.
 
 It was initially created to support macOS on <https://github.com/erlef/setup-beam> builds.
 
 We aim to build all Erlang versions (at most one every 2 hours - for all OS versions) starting from
-Erlang/OTP 24, as per `kerl`'s listing.
+Erlang/OTP 24, as per `kerl`'s listing, and targeting macOS for the versions supported by GitHub
+Actions (11, 12, and 13, at the time of this writing).
 
 ## The build/release pipeline
 
-Using a mix of [Homebrew](https://brew.sh/) and [kerl](https://github.com/kerl/kerl), we build
-Erlang/OTP images that target macOS for the versions supported by GitHub actions (11, 12, and
-13, at the time of this writing).
+We build the Erlang/OTP images using a mix of [Homebrew](https://brew.sh/) and
+[kerl](https://github.com/kerl/kerl), as well as some 3rd party actions. For security reasons, we
+aim to stop depending on these in the future.
 
 ### Documentation chunks
 
@@ -22,12 +23,21 @@ The images are built with documentation chunks as per `make docs DOC_TARGETS=chu
 
 ### Releases
 
-Releases are tagged as `macos-${macos_vsn}-OTP-${otp_vsn}`, and available at
+Releases are tagged as `macos-${macos_vsn}/OTP-${otp_vsn}`, and available at
 <https://github.com/jelly-beam/otp-macos/releases/> under section Assets. We aim to keep naming
 of the assets consistent as to ease use in CI pipelines.
 
 File `_RELEASES` will contain the available `.tar.gz` packages, as well as the execution of
-`crc32` on them and a date (of approximately when the build was finished).
+`crc32` on them and a date (of approximately when the build was finished), in the following format:
+
+```plain
+<OTP-vsn> <crc32_for_tar_gz> <date_as_utc_%Y-%m-%dT%H:%M:%SZ>
+```
+
+Finally, we also include a `.sha256.txt` in releases, for consumers to verify the origin of the
+files. To do so, run `shasum -a 256 <file>` where `<file>` is the downloaded `.tar.gz` asset,
+then compare the result of that operation to `<file>`'s `.sha256.txt` counterpart. If they're
+different feel free to open an issue in this pull request so we can help investigate further.
 
 ### GitHub images
 

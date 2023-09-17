@@ -16,7 +16,7 @@ kerl_checkout() {
     git clone https://github.com/kerl/kerl
     cd kerl || exit
 }
-echo "::group::Kerl: checkout"
+echo "::group::kerl: checkout"
 kerl_checkout
 echo "::endgroup::"
 
@@ -28,7 +28,7 @@ kerl_configure() {
     export KERL_BUILD_DOCS
     echo "OpenSSL is $(openssl version)"
 }
-echo "::group::Kerl: configure"
+echo "::group::kerl: configure"
 kerl_configure
 echo "::endgroup::"
 
@@ -56,7 +56,7 @@ echo "::endgroup::"
 kerl_build_install() {
     KERL_DEBUG=true ./kerl build-install "$OTP_VSN" "$OTP_VSN" "$INSTALL_DIR"
 }
-echo "::group::Kerl: build-install"
+echo "::group::kerl: build-install"
 kerl_build_install
 echo "::endgroup::"
 
@@ -65,14 +65,14 @@ kerl_test() {
     ./bin/erl -s crypto -s init stop
     ./bin/erl_call
 }
-echo "::group::Kerl: test build result"
+echo "::group::kerl: test build result"
 kerl_test
 echo "::endgroup::"
 
 release_prepare() {
     file="macos64-${macos_vsn}-OTP-${OTP_VSN}.tar.gz"
     tar -vzcf "$file" ./*
-    shasum -a 256  "$file" > "${macos_vsn}-OTP-${OTP_VSN}.sha256.txt"
+    shasum -a 256 "$file" > "${macos_vsn}-OTP-${OTP_VSN}.sha256.txt"
 }
 echo "::group::Release: prepare"
 release_prepare
