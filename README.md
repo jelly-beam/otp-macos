@@ -33,6 +33,11 @@ File `_RELEASES` will contain the available `.tar.gz` packages, as well as the e
 <OTP-vsn> <crc32_for_tar_gz> <date_as_utc_%Y-%m-%dT%H:%M:%SZ>
 ```
 
+Finally, we also include a `.sha256.txt` in releases, for consumers to verify the origin of the
+files. To do so, run `shasum -a 256 <file>` where `<file>` is the downloaded `.tar.gz` asset,
+then compare the result of that operation to `<file>`'s `.sha256.txt` counterpart. If they're
+different feel free to open an issue in this pull request so we can help investigate further.
+
 ### GitHub images
 
 Read more about GitHub-hosted runners in the
