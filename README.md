@@ -3,7 +3,7 @@
 [release]: https://github.com/jelly-beam/otp-macos/actions/workflows/release.yml
 [release-img]: https://github.com/jelly-beam/otp-macos/actions/workflows/release.yml/badge.svg
 
-`otp-macos` is a living, and up-to-date, collection of pre-compiled macOS-ready Erlang/OTP versions.
+`otp-macos` is a living, and up-to-date, collection of precompiled macOS-ready Erlang/OTP versions.
 
 It was initially created to support macOS on <https://github.com/erlef/setup-beam> builds.
 
