@@ -72,10 +72,34 @@ echo "::endgroup::"
 release_prepare() {
     file="macos64-${macos_vsn}-OTP-${OTP_VSN}.tar.gz"
     tar -vzcf "$file" ./*
-    shasum -a 256 "$file" > "${macos_vsn}-OTP-${OTP_VSN}.sha256.txt"
+    shasum -a 256 "$file" >"macos64-${macos_vsn}-OTP-${OTP_VSN}.sha256.txt"
 }
 echo "::group::Release: prepare"
 release_prepare
 echo "::endgroup::"
 
-echo "otp_vsn=${OTP_VSN}" >>"$GITHUB_OUTPUT"
+_releases_update() {
+    #!/bin/bash
+
+    filename_no_ext="macos64-${macos_vsn}-OTP-${OTP_VSN}"
+
+    crc32=$(crc32 "$INSTALL_DIR"/"$filename_no_ext.tar.gz")
+    date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    echo "$filename_no_ext $crc32 $date" >>_RELEASES
+
+    sort -o _RELEASES _RELEASES
+
+    git config user.name "GitHub Actions"
+    git config user.email "actions@user.noreply.github.com"
+    git add _RELEASES
+    git commit -m "Update _RELEASES: $filename_no_ext"
+    git push origin "$GITHUB_REF_NAME"
+
+    target_commitish=$(git log -n 1 --pretty=format:"%H")
+    echo "target_commitish=$target_commitish" >>"$GITHUB_OUTPUT"
+}
+echo "::group::_RELEASES: update"
+_releases_update
+echo "::endgroup::"
+
+echo "otp_vsn=$OTP_VSN" >>"$GITHUB_OUTPUT"
