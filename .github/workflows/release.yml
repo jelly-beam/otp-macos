@@ -7,7 +7,7 @@ name: Release
   workflow_dispatch:
   push:
     branches:
-      - "!master"
+      - "!main"
 
 jobs:
   release:
@@ -53,3 +53,4 @@ jobs:
             ${{runner.temp}}/otp/macos64-${{matrix.macos-vsn}}-OTP-${{steps.configure.outputs.otp_vsn}}.sha256.txt
           tag_name: macos64-${{matrix.macos-vsn}}/OTP-${{steps.configure.outputs.otp_vsn}}
           target_commitish: ${{steps.update_releases.outputs.target_commitish}}
+        if: ${{github.ref == 'refs/heads/main'}}
