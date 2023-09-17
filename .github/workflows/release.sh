@@ -4,7 +4,12 @@ macos_vsn=$1
 
 INSTALL_DIR=$RUNNER_TEMP/otp
 
+echo_pwd() {
+    echo "pwd: $PWD"
+}
+
 homebrew_install() {
+    echo_pwd
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 }
 echo "::group::Homebrew: install"
@@ -12,6 +17,7 @@ homebrew_install
 echo "::endgroup::"
 
 kerl_checkout() {
+    echo_pwd
     git clone https://github.com/kerl/kerl
     cd kerl || exit
 }
@@ -20,6 +26,7 @@ kerl_checkout
 echo "::endgroup::"
 
 kerl_configure() {
+    echo_pwd
     ./kerl update releases
     MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
     export MAKEFLAGS
@@ -32,6 +39,7 @@ kerl_configure
 echo "::endgroup::"
 
 pick_otp_vsn() {
+    echo_pwd
     global_OTP_VSN=undefined
     while read -r release; do
         if git show-ref --tags --verify --quiet "refs/tags/macos64-${macos_vsn}-OTP-${release}"; then
@@ -52,6 +60,7 @@ pick_otp_vsn
 echo "::endgroup::"
 
 kerl_build_install() {
+    echo_pwd
     KERL_DEBUG=true ./kerl build-install "$global_OTP_VSN" "$global_OTP_VSN" "$INSTALL_DIR"
 }
 echo "::group::kerl: build-install"
@@ -59,6 +68,7 @@ kerl_build_install
 echo "::endgroup::"
 
 kerl_test() {
+    echo_pwd
     cd "$INSTALL_DIR" || exit
     ./bin/erl -s crypto -s init stop
     ./bin/erl_call
@@ -68,6 +78,7 @@ kerl_test
 echo "::endgroup::"
 
 release_prepare() {
+    echo_pwd
     file="macos64-${macos_vsn}-OTP-${global_OTP_VSN}.tar.gz"
     tar -vzcf "$file" ./*
     shasum -a 256 "$file" >"macos64-${macos_vsn}-OTP-${global_OTP_VSN}.sha256.txt"
@@ -77,6 +88,7 @@ release_prepare
 echo "::endgroup::"
 
 _releases_update() {
+    echo_pwd
     if [ "$GITHUB_REF" == "refs/heads/main" ]; then
         filename_no_ext="macos64-${macos_vsn}-OTP-${global_OTP_VSN}"
 
@@ -98,6 +110,7 @@ _releases_update
 echo "::endgroup::"
 
 config_build_outputs() {
+    echo_pwd
     {
         echo "otp_vsn=$global_OTP_VSN"
         echo "tar_gz=${INSTALL_DIR}/macos64-${macos_vsn}-OTP-${global_OTP_VSN}.tar.gz"
