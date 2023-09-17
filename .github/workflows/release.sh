@@ -72,7 +72,7 @@ echo "::endgroup::"
 release_prepare() {
     file="macos64-${macos_vsn}-OTP-${OTP_VSN}.tar.gz"
     tar -vzcf "$file" ./*
-    shasum -a 256  "$file" > "${macos_vsn}-OTP-${OTP_VSN}-sha256.txt"
+    shasum -a 256  "$file" > "${macos_vsn}-OTP-${OTP_VSN}.sha256.txt"
 }
 echo "::group::Release: prepare"
 release_prepare
