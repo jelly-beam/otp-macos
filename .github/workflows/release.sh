@@ -113,16 +113,11 @@ echo "::endgroup::"
 
 config_build_outputs() {
     echo_pwd
-    if [ "$GITHUB_REF" == "refs/heads/main" ]; then
-        target_commitish=$(git log -n 1 --pretty=format:"%H")
-    else
-        echo "Not setting output $target_commitish (set in main alone)"
-    fi
     {
         echo "otp_vsn=$global_OTP_VSN"
         echo "tar_gz=${INSTALL_DIR}/macos64-${macos_vsn}-OTP-${global_OTP_VSN}.tar.gz"
         echo "sha256_txt=${INSTALL_DIR}/macos64-${macos_vsn}-OTP-${global_OTP_VSN}.sha256.txt"
-        echo "target_commitish=$target_commitish"
+        echo "target_commitish=$(git log -n 1 --pretty=format:"%H)"
     } >>"$GITHUB_OUTPUT"
 }
 echo "::group::Configure and build: outputs"
