@@ -32,28 +32,27 @@ kerl_configure
 echo "::endgroup::"
 
 pick_otp_vsn() {
-    OTP_VSN=undefined
+    global_OTP_VSN=undefined
     while read -r release; do
         if git show-ref --tags --verify --quiet "refs/tags/macos64-${macos_vsn}-OTP-${release}"; then
             continue
         fi
-        OTP_VSN=$release
+        global_OTP_VSN=$release
         break
     done < <(./kerl update releases | tail -n 70)
-    if [ "$OTP_VSN" == "undefined" ]; then
+    if [ "$global_OTP_VSN" == "undefined" ]; then
         echo "  nothing to build. Exiting..."
         echo "::endgroup::"
         exit 0
     fi
-    echo "  picked OTP $OTP_VSN"
-    export OTP_VSN
+    echo "  picked OTP $global_OTP_VSN"
 }
 echo "::group::Erlang/OTP: pick version to build"
 pick_otp_vsn
 echo "::endgroup::"
 
 kerl_build_install() {
-    KERL_DEBUG=true ./kerl build-install "$OTP_VSN" "$OTP_VSN" "$INSTALL_DIR"
+    KERL_DEBUG=true ./kerl build-install "$global_OTP_VSN" "$global_OTP_VSN" "$INSTALL_DIR"
 }
 echo "::group::kerl: build-install"
 kerl_build_install
@@ -69,9 +68,9 @@ kerl_test
 echo "::endgroup::"
 
 release_prepare() {
-    file="macos64-${macos_vsn}-OTP-${OTP_VSN}.tar.gz"
+    file="macos64-${macos_vsn}-OTP-${global_OTP_VSN}.tar.gz"
     tar -vzcf "$file" ./*
-    shasum -a 256 "$file" >"macos64-${macos_vsn}-OTP-${OTP_VSN}.sha256.txt"
+    shasum -a 256 "$file" >"macos64-${macos_vsn}-OTP-${global_OTP_VSN}.sha256.txt"
 }
 echo "::group::Release: prepare"
 release_prepare
@@ -80,7 +79,7 @@ echo "::endgroup::"
 _releases_update() {
     #!/bin/bash
 
-    filename_no_ext="macos64-${macos_vsn}-OTP-${OTP_VSN}"
+    filename_no_ext="macos64-${macos_vsn}-OTP-${global_OTP_VSN}"
 
     crc32=$(crc32 "$INSTALL_DIR"/"$filename_no_ext.tar.gz")
     date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -103,4 +102,4 @@ if [ "$GITHUB_REF" == "refs/heads/main" ]; then
 fi
 echo "::endgroup::"
 
-echo "otp_vsn=$OTP_VSN" >>"$GITHUB_OUTPUT"
+echo "otp_vsn=$global_OTP_VSN" >>"$GITHUB_OUTPUT"
