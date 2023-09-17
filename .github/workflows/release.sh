@@ -64,7 +64,7 @@ kerl_build_install() {
     KERL_DEBUG=true ./kerl build-install "$global_OTP_VSN" "$global_OTP_VSN" "$INSTALL_DIR"
 }
 echo "::group::kerl: build-install"
-#kerl_build_install
+kerl_build_install
 echo "::endgroup::"
 
 kerl_test() {
@@ -74,7 +74,7 @@ kerl_test() {
     ./bin/erl_call
 }
 echo "::group::kerl: test build result"
-#kerl_test
+kerl_test
 echo "::endgroup::"
 
 release_prepare() {
@@ -84,7 +84,7 @@ release_prepare() {
     shasum -a 256 "$file" >"macos64-${macos_vsn}-OTP-${global_OTP_VSN}.sha256.txt"
 }
 echo "::group::Release: prepare"
-#release_prepare
+release_prepare
 echo "::endgroup::"
 
 _releases_update() {
