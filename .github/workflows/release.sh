@@ -184,12 +184,14 @@ echo "::endgroup::"
 config_build_outputs() {
     prepare_tar_gz_path "${global_OTP_VSN}"
     prepare_sha256_txt_path "${global_OTP_VSN}"
+    prepare_git_tag "${global_OTP_VSN}"
 
     {
         echo "otp_vsn=${global_OTP_VSN}"
         echo "tar_gz=${global_TAR_GZ_PATH}"
         echo "sha256_txt=${global_SHA256_TXT_PATH}"
         echo "target_commitish=$(git log -n 1 --pretty=format:"%H")"
+        echo "git_tag=${global_GIT_TAG}"
     } >>"${GITHUB_OUTPUT}"
 }
 echo "::group::Configure and build: outputs"
