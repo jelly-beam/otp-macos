@@ -45,6 +45,8 @@ jobs:
             macOS ${{matrix.macos-vsn}} (64 bit).
           fail_on_unmatched_files: true
           # yamllint disable-line rule:line-length
-          files: ${{runner.temp}}/otp/macos64-${{matrix.macos-vsn}}-OTP-${{steps.configure.outputs.otp_vsn}}.tar.gz
+          files: |
+            ${{runner.temp}}/otp/macos64-${{matrix.macos-vsn}}-OTP-${{steps.configure.outputs.otp_vsn}}.tar.gz
+            ${{runner.temp}}/otp/macos64-${{matrix.macos-vsn}}-OTP-${{steps.configure.outputs.otp_vsn}}.sha256.txt
           tag_name: macos64-${{matrix.macos-vsn}}/OTP-${{steps.configure.outputs.otp_vsn}}
           target_commitish: ${{steps.update_releases.outputs.target_commitish}}
