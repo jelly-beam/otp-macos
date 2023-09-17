@@ -19,7 +19,7 @@ jobs:
     runs-on: macos-${{matrix.macos-vsn}}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac
         with:
           # We want jobs to always checkout the updated branch, since we push to it, below
           ref: ${{github.ref_name}}
@@ -37,7 +37,7 @@ jobs:
           ./.github/workflows/update__releases.sh "$filename_no_ext"
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844
         with:
           body: >
             This is
