@@ -13,9 +13,9 @@ Actions (11, 12, and 13, at the time of this writing).
 
 ## The build/release pipeline
 
-Using a mix of [Homebrew](https://brew.sh/) and [kerl](https://github.com/kerl/kerl), we build
-Erlang/OTP images that target macOS for the versions supported by GitHub actions (11, 12, and
-13, at the time of this writing).
+We build the Erlang/OTP images using a mix of [Homebrew](https://brew.sh/) and
+[kerl](https://github.com/kerl/kerl), as well as some 3rd party actions. For security reasons, we
+aim to stop depending on these in the future.
 
 ### Documentation chunks
 
