@@ -3,8 +3,11 @@ name: Release
 
 "on":
   schedule:
-    - cron: '0 */2 * * *'
+    - cron: 0 */2 * * *
   workflow_dispatch:
+  push:
+    branches-ignore:
+      - main
 
 jobs:
   release:
@@ -35,6 +38,7 @@ jobs:
         run: |
           filename_no_ext="macos64-${{matrix.macos-vsn}}-OTP-${{steps.configure.outputs.otp_vsn}}"
           ./.github/workflows/update__releases.sh "$filename_no_ext"
+        if: ${{github.ref == 'refs/heads/main'}}
 
       - name: Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844  # v1
@@ -50,3 +54,4 @@ jobs:
             ${{runner.temp}}/otp/macos64-${{matrix.macos-vsn}}-OTP-${{steps.configure.outputs.otp_vsn}}.sha256.txt
           tag_name: macos64-${{matrix.macos-vsn}}/OTP-${{steps.configure.outputs.otp_vsn}}
           target_commitish: ${{steps.update_releases.outputs.target_commitish}}
+        if: ${{github.ref == 'refs/heads/main'}}
