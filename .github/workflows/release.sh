@@ -190,9 +190,10 @@ config_build_outputs() {
         echo "otp_vsn=${global_OTP_VSN}"
         echo "tar_gz=${global_TAR_GZ_PATH}"
         echo "sha256_txt=${global_SHA256_TXT_PATH}"
-        echo "target_commitish=$(git log -n 1 --pretty=format:"%H")"
         echo "git_tag=${global_GIT_TAG}"
+        echo "target_commitish=$(git log -n 1 --pretty=format:"%H")"
     } >>"${GITHUB_OUTPUT}"
+    cat "${GITHUB_OUTPUT}"
 }
 echo "::group::Configure and build: outputs"
 cd_initial_dir
