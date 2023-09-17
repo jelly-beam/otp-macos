@@ -29,29 +29,21 @@ jobs:
 
       - name: Configure and build
         timeout-minutes: 20
-        id: configure
+        id: config_build
         run: |
           ./.github/workflows/release.sh ${{matrix.macos-vsn}}
-
-      - name: Update _RELEASES
-        id: update_releases
-        run: |
-          filename_no_ext="macos64-${{matrix.macos-vsn}}-OTP-${{steps.configure.outputs.otp_vsn}}"
-          ./.github/workflows/update__releases.sh "$filename_no_ext"
-        if: ${{github.ref == 'refs/heads/main'}}
 
       - name: Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844  # v1
         with:
           body: >
             This is
-            Erlang/OTP ${{steps.configure.outputs.otp_vsn}} compiled for
+            Erlang/OTP ${{steps.config_build.outputs.otp_vsn}} compiled for
             macOS ${{matrix.macos-vsn}} (64 bit).
           fail_on_unmatched_files: true
-          # yamllint disable-line rule:line-length
           files: |
-            ${{runner.temp}}/otp/macos64-${{matrix.macos-vsn}}-OTP-${{steps.configure.outputs.otp_vsn}}.tar.gz
-            ${{runner.temp}}/otp/macos64-${{matrix.macos-vsn}}-OTP-${{steps.configure.outputs.otp_vsn}}.sha256.txt
-          tag_name: macos64-${{matrix.macos-vsn}}/OTP-${{steps.configure.outputs.otp_vsn}}
-          target_commitish: ${{steps.update_releases.outputs.target_commitish}}
+            ${{steps.config_build.outputs.tar_gz}}
+            ${{steps.config_build.outputs.sha256_txt}}
+          tag_name: ${{steps.config_build.outputs.git_tag}}
+          target_commitish: ${{steps.config_build.outputs.target_commitish}}
         if: ${{github.ref == 'refs/heads/main'}}

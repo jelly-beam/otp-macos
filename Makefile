@@ -11,6 +11,6 @@ all: $(SCRIPTS)
 .PHONY: all
 
 $(SCRIPTS):
-	shfmt -w $@
-	shellcheck $@
+	shfmt -i 4 -w $@
+	shellcheck -o all $@
 .PHONY: $(SCRIPTS)
