@@ -1,5 +1,4 @@
 #!/bin/bash
-#shellcheck disable=SC1091 # Not following: ./activate was not specified as input.
 
 macos_vsn=$1
 
