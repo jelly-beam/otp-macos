@@ -1,7 +1,6 @@
 #!/bin/bash
 
-macos_vsn=$1
-
+global_MACOS_VSN=$1
 global_INSTALL_DIR=$RUNNER_TEMP/otp
 
 # Helper functions
@@ -11,19 +10,61 @@ cd_install_dir() {
 }
 
 set_initial_dir() {
-    global_BASE_DIR="$PWD"
+    global_INITIAL_DIR=$PWD
 }
 
 cd_initial_dir() {
-    cd "$global_BASE_DIR" || exit
+    cd "$global_INITIAL_DIR" || exit
 }
 
 set_kerl_dir() {
-    global_KERL_DIR="$PWD"
+    global_KERL_DIR=$PWD
 }
 
 cd_kerl_dir() {
     cd "$global_KERL_DIR" || exit
+}
+
+prepare_git_tag() {
+    otp_vsn=$1
+
+    # The format used for the Git tags
+    global_GIT_TAG=macos64-${global_MACOS_VSN}/OTP-${otp_vsn}
+}
+
+prepare_filename_no_ext() {
+    otp_vsn=$1
+
+    # The format used for the generated filenames
+    global_FILENAME_NO_EXT=macos64-${global_MACOS_VSN}-OTP-${otp_vsn}
+}
+
+prepare_filename_tar_gz() {
+    otp_vsn=$1
+
+    prepare_filename_no_ext "$otp_vsn"
+    global_FILENAME_TAR_GZ=$global_FILENAME_NO_EXT.tar.gz
+}
+
+prepare_filename_sha256_txt() {
+    otp_vsn=$1
+
+    prepare_filename_no_ext "$otp_vsn"
+    global_FILENAME_SHA256_TXT=$global_FILENAME_NO_EXT.sha256.txt
+}
+
+prepare_tar_gz_path() {
+    otp_vsn=$1
+
+    prepare_filename_tar_gz "$otp_vsn"
+    global_TAR_GZ_PATH=$INSTALL_DIR/$global_FILENAME_TAR_GZ
+}
+
+prepare_sha256_txt_path() {
+    otp_vsn=$1
+
+    prepare_filename_sha256_txt "$otp_vsn"
+    global_SHA256_TXT_PATH=$INSTALL_DIR/$global_FILENAME_SHA256_TXT
 }
 
 # Workflow groups
@@ -47,11 +88,14 @@ echo "::endgroup::"
 
 kerl_configure() {
     ./kerl update releases
+
     MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
     export MAKEFLAGS
-    KERL_BUILD_DOCS="yes"
+
+    KERL_BUILD_DOCS=yes
     export KERL_BUILD_DOCS
-    echo "OpenSSL is $(openssl version)"
+
+    echo OpenSSL is "$(openssl version)"
 }
 echo "::group::kerl: configure"
 cd_kerl_dir
@@ -61,9 +105,12 @@ echo "::endgroup::"
 pick_otp_vsn() {
     global_OTP_VSN=undefined
     while read -r release; do
-        if git show-ref --tags --verify --quiet "refs/tags/macos64-${macos_vsn}-OTP-${release}"; then
+        prepare_git_tag "$release"
+
+        if git show-ref --tags --verify --quiet "refs/tags/${global_GIT_TAG}"; then
             continue
         fi
+
         global_OTP_VSN=$release
         break
     done < <(./kerl update releases | tail -n 70)
@@ -97,9 +144,11 @@ kerl_test
 echo "::endgroup::"
 
 release_prepare() {
-    file="macos64-${macos_vsn}-OTP-${global_OTP_VSN}.tar.gz"
-    tar -vzcf "$file" ./*
-    shasum -a 256 "$file" >"macos64-${macos_vsn}-OTP-${global_OTP_VSN}.sha256.txt"
+    prepare_filename_tar_gz "$global_OTP_VSN"
+    prepare_filename_sha256_txt "$global_OTP_VSN"
+
+    tar -vzcf "$global_FILENAME_TAR_GZ" ./*
+    shasum -a 256 "$global_FILENAME_TAR_GZ" >"$global_FILENAME_SHA256_TXT"
 }
 echo "::group::Release: prepare"
 cd_install_dir
@@ -108,18 +157,18 @@ echo "::endgroup::"
 
 _releases_update() {
     if [ "$GITHUB_REF" == "refs/heads/main" ]; then
-        filename_no_ext="macos64-${macos_vsn}-OTP-${global_OTP_VSN}"
+        prepare_filename_no_ext "$global_OTP_VSN"
+        prepare_tar_gz_path "$global_OTP_VSN"
 
-        crc32=$(crc32 "$INSTALL_DIR"/"$filename_no_ext.tar.gz")
+        crc32=$(crc32 "$global_TAR_GZ_PATH")
         date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-        echo "$filename_no_ext $crc32 $date" >>_RELEASES
-
+        echo "$global_FILENAME_NO_EXT $crc32 $date" >>_RELEASES
         sort -o _RELEASES _RELEASES
 
         git config user.name "GitHub Actions"
         git config user.email "actions@user.noreply.github.com"
         git add _RELEASES
-        git commit -m "Update _RELEASES: $filename_no_ext"
+        git commit -m "Update _RELEASES: $global_FILENAME_NO_EXT"
         git push origin "$GITHUB_REF_NAME"
     else
         echo "Skipping branch $GITHUB_REF (runs in main alone)"
@@ -131,11 +180,13 @@ _releases_update
 echo "::endgroup::"
 
 config_build_outputs() {
-    cd "$global_BASE_DIR" || exit
+    prepare_tar_gz_path "$global_OTP_VSN"
+    prepare_sha256_txt_path "$global_OTP_VSN"
+
     {
         echo "otp_vsn=$global_OTP_VSN"
-        echo "tar_gz=${INSTALL_DIR}/macos64-${macos_vsn}-OTP-${global_OTP_VSN}.tar.gz"
-        echo "sha256_txt=${INSTALL_DIR}/macos64-${macos_vsn}-OTP-${global_OTP_VSN}.sha256.txt"
+        echo "tar_gz=$global_TAR_GZ_PATH"
+        echo "sha256_txt=$global_SHA256_TXT_PATH"
         echo "target_commitish=$(git log -n 1 --pretty=format:"%H")"
     } >>"$GITHUB_OUTPUT"
 }
