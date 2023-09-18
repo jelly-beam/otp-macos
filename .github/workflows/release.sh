@@ -158,7 +158,7 @@ release_prepare
 echo "::endgroup::"
 
 _releases_update() {
-    if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+    #if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
         prepare_filename_no_ext "${global_OTP_VSN}"
         prepare_tar_gz_path "${global_OTP_VSN}"
 
@@ -178,9 +178,9 @@ _releases_update() {
         gh pr review "${pr}" -a
         gh pr merge "${pr}" --admin --auto
         git switch main
-    else
-        echo "Skipping branch ${GITHUB_REF_NAME} (runs in main alone)"
-    fi
+    #else
+    #    echo "Skipping branch ${GITHUB_REF_NAME} (runs in main alone)"
+    #fi
 }
 echo "::group::_RELEASES: update"
 cd_initial_dir
