@@ -32,6 +32,8 @@ jobs:
         id: config_build
         run: |
           ./.github/workflows/release.sh ${{matrix.macos-vsn}}
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844  # v1
