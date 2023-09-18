@@ -132,8 +132,8 @@ kerl_build_install() {
     KERL_DEBUG=true ./kerl build-install "${global_OTP_VSN}" "${global_OTP_VSN}" "${global_INSTALL_DIR}"
 }
 echo "::group::kerl: build-install"
-cd_kerl_dir
-kerl_build_install
+#cd_kerl_dir
+#kerl_build_install
 echo "::endgroup::"
 
 kerl_test() {
@@ -141,8 +141,8 @@ kerl_test() {
     ./bin/erl_call
 }
 echo "::group::kerl: test build result"
-cd_install_dir
-kerl_test
+#cd_install_dir
+#kerl_test
 echo "::endgroup::"
 
 release_prepare() {
@@ -153,8 +153,8 @@ release_prepare() {
     shasum -a 256 "${global_FILENAME_TAR_GZ}" >"${global_FILENAME_SHA256_TXT}"
 }
 echo "::group::Release: prepare"
-cd_install_dir
-release_prepare
+#cd_install_dir
+#release_prepare
 echo "::endgroup::"
 
 _releases_update() {
@@ -170,13 +170,13 @@ _releases_update() {
         release_name="release/${global_FILENAME_NO_EXT}"
         git config user.name "GitHub Actions"
         git config user.email "actions@user.noreply.github.com"
+        git switch -c "${release_name}"
         git add _RELEASES
-        git switch -c releases "${release_name}"
-        git commit -m "Update _RELEASES: ${global_FILENAME_NO_EXT}"
+        commit_msg="Update _RELEASES: add ${global_FILENAME_NO_EXT}"
+        git commit -m "${commit_msg}"
         git push origin "${release_name}"
-        pr=$(gh pr create -B main -t "Automation: update _RELEASES for ${global_FILENAME_NO_EXT}")
-        gh pr review "${pr}" -a
-        gh pr merge "${pr}" --admin --auto
+        pr=$(gh pr create -B main -t "[automation] ${commit_msg}" -b "🔒 tight, tight, tight!")
+        gh pr merge "${pr}" -s
         git switch main
     #else
     #    echo "Skipping branch ${GITHUB_REF_NAME} (runs in main alone)"
