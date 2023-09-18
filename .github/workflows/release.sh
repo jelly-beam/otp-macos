@@ -105,12 +105,11 @@ kerl_configure
 echo "::endgroup::"
 
 pick_otp_vsn() {
-    git fetch --all --tags
     global_OTP_VSN=undefined
     while read -r release; do
         prepare_git_tag "${release}"
 
-        if git show-ref --tags --verify --quiet "refs/tags/${global_GIT_TAG}"; then
+        if grep "${global_GIT_TAG} " _RELEASES; then
             continue
         fi
 
@@ -159,7 +158,7 @@ release_prepare
 echo "::endgroup::"
 
 _releases_update() {
-    if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+    if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
         prepare_filename_no_ext "${global_OTP_VSN}"
         prepare_tar_gz_path "${global_OTP_VSN}"
 
@@ -180,7 +179,7 @@ _releases_update() {
         gh pr merge "${pr}" --admin --auto
         git switch main
     else
-        echo "Skipping branch ${GITHUB_REF} (runs in main alone)"
+        echo "Skipping branch ${GITHUB_REF_NAME} (runs in main alone)"
     fi
 }
 echo "::group::_RELEASES: update"
