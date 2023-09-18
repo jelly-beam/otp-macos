@@ -167,11 +167,17 @@ _releases_update() {
         echo "${global_FILENAME_NO_EXT} ${crc32} ${date}" >>_RELEASES
         sort -o _RELEASES _RELEASES
 
+        release_name="release/${global_FILENAME_NO_EXT}"
         git config user.name "GitHub Actions"
         git config user.email "actions@user.noreply.github.com"
         git add _RELEASES
+        git switch -c releases "${release_name}"
         git commit -m "Update _RELEASES: ${global_FILENAME_NO_EXT}"
-        git push origin "${GITHUB_REF_NAME}"
+        git push origin "${release_name}"
+        pr=$(gh pr create -B main -t "Automation: update _RELEASES for ${global_FILENAME_NO_EXT}")
+        gh pr review ${pr} -a
+        gh pr merge ${pr} --admin --auto
+        git switch main
     else
         echo "Skipping branch ${GITHUB_REF} (runs in main alone)"
     fi
