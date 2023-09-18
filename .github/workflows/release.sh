@@ -175,8 +175,8 @@ _releases_update() {
         git commit -m "Update _RELEASES: ${global_FILENAME_NO_EXT}"
         git push origin "${release_name}"
         pr=$(gh pr create -B main -t "Automation: update _RELEASES for ${global_FILENAME_NO_EXT}")
-        gh pr review ${pr} -a
-        gh pr merge ${pr} --admin --auto
+        gh pr review "${pr}" -a
+        gh pr merge "${pr}" --admin --auto
         git switch main
     else
         echo "Skipping branch ${GITHUB_REF} (runs in main alone)"
