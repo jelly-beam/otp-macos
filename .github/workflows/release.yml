@@ -26,7 +26,6 @@ jobs:
         with:
           # We want jobs to always checkout the updated branch, since we push to it, below
           ref: ${{github.ref_name}}
-          fetch-depth: 0
 
       - name: Configure and build
         timeout-minutes: 20
