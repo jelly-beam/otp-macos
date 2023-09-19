@@ -26,12 +26,15 @@ jobs:
         with:
           # We want jobs to always checkout the updated branch, since we push to it, below
           ref: ${{github.ref_name}}
+          fetch-depth: 0
 
       - name: Configure and build
         timeout-minutes: 20
         id: config_build
         run: |
           ./.github/workflows/release.sh ${{matrix.macos-vsn}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844  # v1

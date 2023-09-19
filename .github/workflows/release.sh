@@ -105,14 +105,15 @@ kerl_configure
 echo "::endgroup::"
 
 pick_otp_vsn() {
-    git fetch --all --tags
     global_OTP_VSN=undefined
     while read -r release; do
         prepare_git_tag "${release}"
 
+        pushd "${global_INITIAL_DIR}" || exit
         if git show-ref --tags --verify --quiet "refs/tags/${global_GIT_TAG}"; then
             continue
         fi
+        popd "${global_INITIAL_DIR}" || exit
 
         global_OTP_VSN=${release}
         break
