@@ -31,9 +31,14 @@ jobs:
           strict: true
           config_file: .yamllint.yml
 
-      - name: shellcheck
-        uses: ludeeus/action-shellcheck@00cae500b08a931fb5698e11e79bfbd38e612a38  # 2.0.0
+      - name: shellcheck+shfmt
+        uses: luizm/action-sh-checker@76ab0b22e1f194e4a582edc7969df6485c4e9246  # v0.7.0
         with:
           scandir: .github/workflows
         env:
           SHELLCHECK_OPTS: -o all
+          SHFMT_OPTS: -i 4
+
+      - name: Check push (shfmt)
+        run: |
+          git diff --exit-code
