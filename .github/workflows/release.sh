@@ -132,8 +132,8 @@ kerl_build_install() {
     KERL_DEBUG=true ./kerl build-install "${global_OTP_VSN}" "${global_OTP_VSN}" "${global_INSTALL_DIR}"
 }
 echo "::group::kerl: build-install"
-cd_kerl_dir
-kerl_build_install
+#cd_kerl_dir
+#kerl_build_install
 echo "::endgroup::"
 
 kerl_test() {
@@ -141,8 +141,8 @@ kerl_test() {
     ./bin/erl_call
 }
 echo "::group::kerl: test build result"
-cd_install_dir
-kerl_test
+#cd_install_dir
+#kerl_test
 echo "::endgroup::"
 
 release_prepare() {
@@ -153,12 +153,12 @@ release_prepare() {
     shasum -a 256 "${global_FILENAME_TAR_GZ}" >"${global_FILENAME_SHA256_TXT}"
 }
 echo "::group::Release: prepare"
-cd_install_dir
-release_prepare
+#cd_install_dir
+#release_prepare
 echo "::endgroup::"
 
 _releases_update() {
-    if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+    #if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
         prepare_filename_no_ext "${global_OTP_VSN}"
         prepare_tar_gz_path "${global_OTP_VSN}"
 
@@ -178,9 +178,9 @@ _releases_update() {
         pr=$(gh pr create -B main -t "[automation] ${commit_msg}" -b "🔒 tight, tight, tight!")
         gh pr merge "${pr}" -s
         git switch main
-    else
-        echo "Skipping branch ${GITHUB_REF_NAME} (runs in main alone)"
-    fi
+    #else
+    #    echo "Skipping branch ${GITHUB_REF_NAME} (runs in main alone)"
+    #fi
 }
 echo "::group::_RELEASES: update"
 cd_initial_dir
