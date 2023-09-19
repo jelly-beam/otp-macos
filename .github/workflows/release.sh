@@ -109,9 +109,11 @@ pick_otp_vsn() {
     while read -r release; do
         prepare_git_tag "${release}"
 
+        pushd "${global_INITIAL_DIR}" || exit
         if grep "${global_GIT_TAG} " _RELEASES; then
             continue
         fi
+        popd || exit
 
         global_OTP_VSN=${release}
         break
