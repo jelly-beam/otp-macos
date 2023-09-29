@@ -105,14 +105,15 @@ kerl_configure
 echo "::endgroup::"
 
 pick_otp_vsn() {
-    git fetch --all --tags
     global_OTP_VSN=undefined
     while read -r release; do
         prepare_git_tag "${release}"
 
-        if git show-ref --tags --verify --quiet "refs/tags/${global_GIT_TAG}"; then
+        pushd "${global_INITIAL_DIR}" || exit
+        if grep "${global_GIT_TAG} " _RELEASES; then
             continue
         fi
+        popd || exit
 
         global_OTP_VSN=${release}
         break
@@ -159,7 +160,7 @@ release_prepare
 echo "::endgroup::"
 
 _releases_update() {
-    if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+    if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
         prepare_filename_no_ext "${global_OTP_VSN}"
         prepare_tar_gz_path "${global_OTP_VSN}"
 
@@ -171,16 +172,16 @@ _releases_update() {
         release_name="release/${global_FILENAME_NO_EXT}"
         git config user.name "GitHub Actions"
         git config user.email "actions@user.noreply.github.com"
+        git switch -c "${release_name}"
         git add _RELEASES
-        git switch -c releases "${release_name}"
-        git commit -m "Update _RELEASES: ${global_FILENAME_NO_EXT}"
+        commit_msg="Update _RELEASES: add ${global_FILENAME_NO_EXT}"
+        git commit -m "${commit_msg}"
         git push origin "${release_name}"
-        pr=$(gh pr create -B main -t "Automation: update _RELEASES for ${global_FILENAME_NO_EXT}")
-        gh pr review "${pr}" -a
-        gh pr merge "${pr}" --admin --auto
+        pr=$(gh pr create -B main -t "[automation] ${commit_msg}" -b "🔒 tight, tight, tight!")
+        gh pr merge "${pr}" -s
         git switch main
     else
-        echo "Skipping branch ${GITHUB_REF} (runs in main alone)"
+        echo "Skipping branch ${GITHUB_REF_NAME} (runs in main alone)"
     fi
 }
 echo "::group::_RELEASES: update"
