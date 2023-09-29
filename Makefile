@@ -6,11 +6,18 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
 SCRIPTS := $(wildcard .github/workflows/*.sh)
+WORKFLOWS := $(wildcard .github/workflows/*.yml)
 
-all: $(SCRIPTS)
+SHELLCHECK_OPTS="-o all"
+
+all: $(SCRIPTS) $(WORKFLOWS)
 .PHONY: all
 
 $(SCRIPTS):
 	shfmt -i 4 -w $@
-	shellcheck -o all $@
+	SHELLCHECK_OPTS=$(SHELLCHECK_OPTS) shellcheck $@
 .PHONY: $(SCRIPTS)
+
+$(WORKFLOWS):
+	SHELLCHECK_OPTS=$(SHELLCHECK_OPTS) actionlint $@
+.PHONY: $(WORKFLOWS)

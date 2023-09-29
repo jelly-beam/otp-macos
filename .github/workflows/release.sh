@@ -118,7 +118,7 @@ pick_otp_vsn() {
         global_OTP_VSN=${release}
         break
     done < <(./kerl update releases | tail -n 70)
-    if [ "${global_OTP_VSN}" == undefined ]; then
+    if [[ "${global_OTP_VSN}" == undefined ]]; then
         echo "  nothing to build. Exiting..."
         echo "::endgroup::"
         exit 0
@@ -160,7 +160,7 @@ release_prepare
 echo "::endgroup::"
 
 _releases_update() {
-    if [ "${GITHUB_REF_NAME}" == main ]; then
+    if [[ "${GITHUB_REF_NAME}" == main ]]; then
         prepare_filename_no_ext "${global_OTP_VSN}"
         prepare_tar_gz_path "${global_OTP_VSN}"
 

@@ -7,6 +7,9 @@ jobs:
   lint:
     name: Lint
 
+    env:
+      SHELLCHECK_OPTS: -o all
+
     runs-on: ubuntu-latest
 
     steps:
@@ -35,7 +38,9 @@ jobs:
         uses: luizm/action-sh-checker@76ab0b22e1f194e4a582edc7969df6485c4e9246  # v0.7.0
         with:
           scandir: .github/workflows
-        env:
-          SHELLCHECK_OPTS: -o all
           SHFMT_OPTS: -i 4
 
+      - name: actionlint
+        uses: raven-actions/actionlint@d6c9e3222b489401880e866bc6715049773b63a3  # v1.0.2
+        with:
+          files: .github/workflows/*.yml
