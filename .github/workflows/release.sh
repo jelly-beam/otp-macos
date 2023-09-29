@@ -117,7 +117,7 @@ pick_otp_vsn() {
 
         global_OTP_VSN=${release}
         break
-    done < <(./kerl update releases | tail -n 70)
+    done < <(./kerl update releases | tail -n 72)
     if [[ "${global_OTP_VSN}" == undefined ]]; then
         echo "  nothing to build. Exiting..."
         echo "::endgroup::"
