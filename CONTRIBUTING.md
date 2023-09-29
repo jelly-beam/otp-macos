@@ -52,6 +52,8 @@ can do, and is repeatable in any way, should be tested, to guarantee backwards c
 - indentation is 4 spaces, not tabs
 - try not to introduce lines longer than 100 characters
 - comment tricky or non-obvious decisions made to explain their rationale
+- make sure you install `shellcheck`, `shfmt`, and `actionlint` to run  `make` (otherwise you
+can also rely on comments/suggestions from code maintainers to repair code)
 
 ### Committing your changes
 
