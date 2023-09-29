@@ -108,8 +108,18 @@ pick_otp_vsn() {
     global_OTP_VSN=undefined
     while read -r release; do
         if [[ $release =~ ^[0-9].*$ ]]; then
+            high=${release%%.*}
+            echo "  Found latest major version to be ${high}"
+            oldest_supported=$((high - 2))
+            echo "  thus the oldest support version (per our support policy is) ${oldest_supported}"
+            break
+        fi
+    done < <(./kerl list releases all | sort -r)
+
+    while read -r release; do
+        if [[ $release =~ ^[0-9].*$ ]]; then
             major=${release%%.*}
-            if [[ $major -lt 24 ]]; then
+            if [[ $major -lt $oldest_supported ]]; then
                 continue
             fi
 
