@@ -39,6 +39,3 @@ jobs:
           SHELLCHECK_OPTS: -o all
           SHFMT_OPTS: -i 4
 
-      - name: Check push (shfmt)
-        run: |
-          git diff --exit-code
