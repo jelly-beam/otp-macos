@@ -107,17 +107,24 @@ echo "::endgroup::"
 pick_otp_vsn() {
     global_OTP_VSN=undefined
     while read -r release; do
-        prepare_git_tag "${release}"
+        if [[ $release =~ ^[0-9].*$ ]]; then
+            major=${release%%.*}
+            if [[ $major -lt 24 ]]; then
+                continue
+            fi
 
-        pushd "${global_INITIAL_DIR}" || exit
-        if grep "${global_GIT_TAG} " _RELEASES; then
-            continue
+            prepare_git_tag "${release}"
+
+            pushd "${global_INITIAL_DIR}" || exit
+            if test -f _RELEASES && grep "${global_GIT_TAG} " _RELEASES; then
+                continue
+            fi
+            popd || exit
+
+            global_OTP_VSN=${release}
+            break
         fi
-        popd || exit
-
-        global_OTP_VSN=${release}
-        break
-    done < <(cat ~/.kerl/otp_release | tail -n 72)
+    done < <(./kerl list releases all)
     if [[ "${global_OTP_VSN}" == undefined ]]; then
         echo "  nothing to build. Exiting..."
         echo "::endgroup::"
