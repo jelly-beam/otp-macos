@@ -107,18 +107,35 @@ echo "::endgroup::"
 pick_otp_vsn() {
     global_OTP_VSN=undefined
     while read -r release; do
-        prepare_git_tag "${release}"
-
-        pushd "${global_INITIAL_DIR}" || exit
-        if grep "${global_GIT_TAG} " _RELEASES; then
-            continue
+        if [[ $release =~ ^[0-9].*$ ]]; then
+            high=${release%%.*}
+            echo "  Found latest major version to be ${high}"
+            oldest_supported=$((high - 2))
+            echo "  thus the oldest support version (per our support policy is) ${oldest_supported}"
+            break
         fi
-        popd || exit
+    done < <(./kerl list releases all | sort -r)
 
-        global_OTP_VSN=${release}
-        break
-    done < <(./kerl update releases | tail -n 70)
-    if [[ "${global_OTP_VSN}" == "undefined" ]]; then
+    while read -r release; do
+        if [[ $release =~ ^[0-9].*$ ]]; then
+            major=${release%%.*}
+            if [[ $major -lt $oldest_supported ]]; then
+                continue
+            fi
+
+            prepare_git_tag "${release}"
+
+            pushd "${global_INITIAL_DIR}" || exit
+            if test -f _RELEASES && grep "${global_GIT_TAG} " _RELEASES; then
+                continue
+            fi
+            popd || exit
+
+            global_OTP_VSN=${release}
+            break
+        fi
+    done < <(./kerl list releases all)
+    if [[ "${global_OTP_VSN}" == undefined ]]; then
         echo "  nothing to build. Exiting..."
         echo "::endgroup::"
         exit 0
@@ -160,7 +177,7 @@ release_prepare
 echo "::endgroup::"
 
 _releases_update() {
-    if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+    if [[ "${GITHUB_REF_NAME}" == main ]]; then
         prepare_filename_no_ext "${global_OTP_VSN}"
         prepare_tar_gz_path "${global_OTP_VSN}"
 
