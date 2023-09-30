@@ -18,7 +18,7 @@
 `otp-macos` is not perfect software and will be buggy.
 
 Bugs can be reported via
-[GitHub issues: bug report](/jelly-beam/otp-macos/issues/new?template=bug_report.md).
+[GitHub issues: bug report](https://github.com/jelly-beam/otp-macos/releases/jelly-beam/otp-macos/issues/new?template=bug_report.md).
 
 Some contributors and maintainers may be unpaid developers working on `otp-macos`, in their
 own time, with limited resources. We ask for respect and understanding, and will provide the same
@@ -31,13 +31,13 @@ is solved, but help prevent future regressions related to it.
 
 Before requesting or implementing a new feature, do the following:
 
-- search, in existing [issues](/jelly-beam/otp-macos/issues)
+- search, in existing [issues](https://github.com/jelly-beam/otp-macos/releases/jelly-beam/otp-macos/issues)
 (open or closed), whether the feature might already be in the works, or has already been rejected,
 - make sure you're using the latest software release (or even the latest code, if you're going for
 _bleeding edge_).
 
 If this is done, open up a
-[GitHub issues: feature request](/jelly-beam/otp-macos/issues/new?template=feature_request.md).
+[GitHub issues: feature request](https://github.com/jelly-beam/otp-macos/releases/jelly-beam/otp-macos/issues/new?template=feature_request.md).
 
 We may discuss details with you regarding the implementation, and its inclusion within the project.
 
@@ -75,4 +75,4 @@ done by reviewers.
 ### Credits
 
 `otp-macos` has been improved by
-[many contributors](/jelly-beam/otp-macos/graphs/contributors)!
+[many contributors](https://github.com/jelly-beam/otp-macos/releases/jelly-beam/otp-macos/graphs/contributors)!
