@@ -123,7 +123,7 @@ pick_otp_vsn() {
             local high=${release%%.*}
             echo "  Found latest major version to be ${high}"
             oldest_supported=$((high - 2))
-            echo "    thus the oldest support version (per our support policy is) ${oldest_supported}"
+            echo "    thus the oldest support version (per our support policy) is ${oldest_supported}"
             break
         fi
     done <<<"${kerl_releases_reversed}"
