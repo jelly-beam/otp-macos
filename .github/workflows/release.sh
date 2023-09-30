@@ -38,7 +38,7 @@ prepare_filename_no_ext() {
     local otp_vsn=$1
 
     # The format used for the generated filenames
-    global_FILENAME_NO_EXT=macos64-${global_MACOS_VSN}-OTP-${otp_vsn}
+    global_FILENAME_NO_EXT=macos64-${global_MACOS_VSN}_OTP-${otp_vsn}
 }
 
 prepare_filename_tar_gz() {
@@ -107,7 +107,7 @@ echo "::endgroup::"
 pick_otp_vsn() {
     global_OTP_VSN=undefined
     while read -r release; do
-        if [[ $release =~ ^[0-9].*$ ]]; then
+        if [[ ${release} =~ ^[0-9].*$ ]]; then
             high=${release%%.*}
             echo "  Found latest major version to be ${high}"
             oldest_supported=$((high - 2))
@@ -117,16 +117,16 @@ pick_otp_vsn() {
     done < <(./kerl list releases all | sort -r)
 
     while read -r release; do
-        if [[ $release =~ ^[0-9].*$ ]]; then
+        if [[ ${release} =~ ^[0-9].*$ ]]; then
             major=${release%%.*}
-            if [[ $major -lt $oldest_supported ]]; then
+            if [[ ${major} -lt ${oldest_supported} ]]; then
                 continue
             fi
 
-            prepare_git_tag "${release}"
+            prepare_filename_no_ext "${release}"
 
             pushd "${global_INITIAL_DIR}" || exit
-            if test -f _RELEASES && grep "${global_GIT_TAG} " _RELEASES; then
+            if test -f _RELEASES && grep "${global_FILENAME_NO_EXT} " _RELEASES; then
                 continue
             fi
             popd || exit

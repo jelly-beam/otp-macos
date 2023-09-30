@@ -23,7 +23,7 @@ The images are built with documentation chunks as per `make docs DOC_TARGETS=chu
 
 ### Releases
 
-Releases are tagged as `macos-${macos_vsn}/OTP-${otp_vsn}`, and available at
+Releases are tagged as `macos64-${macos_vsn}/OTP-${otp_vsn}`, and available at
 <https://github.com/jelly-beam/otp-macos/releases/> under section Assets. We aim to keep naming
 of the assets consistent as to ease use in CI pipelines.
 
@@ -31,8 +31,13 @@ File `_RELEASES` will contain the available `.tar.gz` packages, as well as the e
 `crc32` on them and a date (of approximately when the build was finished), in the following format:
 
 ```plain
-<OTP-vsn> <crc32_for_tar_gz> <date_as_utc_%Y-%m-%dT%H:%M:%SZ>
+<vsn> <crc32_for_tar_gz> <date_as_utc_%Y-%m-%dT%H:%M:%SZ>
 ```
+
+where:
+
+* `vsn` (the name of the file with the build), is `macos64-${macos_vsn}_OTP-${otp_vsn}` (similar
+to the tag, but notice the `_` instead of the `/`)
 
 Finally, we also include a `.sha256.txt` in releases, for consumers to verify the origin of the
 files. To do so, run `shasum -a 256 <file>` where `<file>` is the downloaded `.tar.gz` asset,
