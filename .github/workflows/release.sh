@@ -85,6 +85,13 @@ is_nightly_otp_for() {
     fi
 }
 
+export_kerl_configuration_option() {
+    # $1: configuration option
+
+    KERL_CONFIGURE_OPTIONS="${KERL_CONFIGURE_OPTIONS:-} $1"
+    export KERL_CONFIGURE_OPTIONS
+}
+
 # Workflow groups
 
 homebrew_install() {
@@ -114,6 +121,11 @@ kerl_configure() {
 
     KERL_BUILD_DOCS=yes
     export KERL_BUILD_DOCS
+
+    export_kerl_configuration_option "--disable-dynamic-ssl-lib"
+    local with_ssl
+    with_ssl="$(command -v openssl)/../.."
+    export_kerl_configuration_option "--with-ssl=${with_ssl}"
 
     local openssl_version
     openssl_version=$(openssl version)
