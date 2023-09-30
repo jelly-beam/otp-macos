@@ -123,7 +123,7 @@ pick_otp_vsn() {
             local high=${release%%.*}
             echo "  Found latest major version to be ${high}"
             oldest_supported=$((high - 2))
-            echo "  thus the oldest support version (per our support policy is) ${oldest_supported}"
+            echo "    thus the oldest support version (per our support policy is) ${oldest_supported}"
             break
         fi
     done <<<"${kerl_releases_reversed}"
@@ -132,7 +132,7 @@ pick_otp_vsn() {
         if [[ ${release} =~ ^[0-9].*$ ]]; then
             local major=${release%%.*}
             if [[ ${oldest_supported} == undefined ]]; then
-                echo "  couldn't determine oldest support version. Exiting..."
+                echo "  Couldn't determine oldest support version. Exiting..."
                 exit 1
             fi
             if [[ ${major} -lt ${oldest_supported} ]]; then
@@ -153,7 +153,7 @@ pick_otp_vsn() {
         fi
     done <<<"${kerl_releases}"
     if [[ "${otp_vsn}" == undefined ]]; then
-        echo "  nothing to build. Exiting..."
+        echo "  Nothing to build. Exiting..."
         echo "::endgroup::"
         exit 0
     fi
