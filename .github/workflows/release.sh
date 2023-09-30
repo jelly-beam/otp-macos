@@ -38,7 +38,7 @@ prepare_filename_no_ext() {
     local otp_vsn=$1
 
     # The format used for the generated filenames
-    global_FILENAME_NO_EXT=macos64-${global_MACOS_VSN}-OTP-${otp_vsn}
+    global_FILENAME_NO_EXT=macos64-${global_MACOS_VSN}_OTP-${otp_vsn}
 }
 
 prepare_filename_tar_gz() {
@@ -123,10 +123,10 @@ pick_otp_vsn() {
                 continue
             fi
 
-            prepare_git_tag "${release}"
+            prepare_filename_no_ext "${release}"
 
             pushd "${global_INITIAL_DIR}" || exit
-            if test -f _RELEASES && grep "${global_GIT_TAG} " _RELEASES; then
+            if test -f _RELEASES && grep "${global_FILENAME_NO_EXT} " _RELEASES; then
                 continue
             fi
             popd || exit
