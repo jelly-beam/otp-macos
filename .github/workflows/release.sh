@@ -199,7 +199,7 @@ cd_install_dir
 release_prepare "${global_OTP_VSN}"
 echo "::endgroup::"
 
-releases_update() {
+_releases_update() {
     # $1: OTP version
 
     if [[ "${GITHUB_REF_NAME}" == main ]]; then
@@ -233,7 +233,7 @@ releases_update() {
 }
 echo "::group::_RELEASES: update"
 cd_initial_dir
-releases_update "${global_OTP_VSN}"
+_releases_update "${global_OTP_VSN}"
 echo "::endgroup::"
 
 config_build_outputs() {
