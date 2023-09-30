@@ -48,7 +48,6 @@ jobs:
             This is
             Erlang/OTP ${{steps.config_build.outputs.otp_vsn}} compiled for
             macOS ${{matrix.macos-vsn}} (64 bit).
-          fail_on_unmatched_files: true
           files: |
             ${{steps.config_build.outputs.tar_gz}}
             ${{steps.config_build.outputs.sha256_txt}}
