@@ -1,7 +1,7 @@
 # `otp-macos` [![Release][release-img]][release]
 
-[release]: https://github.com/jelly-beam/otp-macos/actions/workflows/release.yml
-[release-img]: https://github.com/jelly-beam/otp-macos/actions/workflows/release.yml/badge.svg
+[release]: /jelly-beam/otp-macos/actions/workflows/release.yml
+[release-img]: /jelly-beam/otp-macos/actions/workflows/release.yml/badge.svg
 
 `otp-macos` is a living, and up-to-date, collection of precompiled macOS-ready Erlang/OTP versions.
 
@@ -14,7 +14,7 @@ Actions (11, 12, and 13, at the time of this writing).
 ## The build/release pipeline
 
 We build the Erlang/OTP images using a mix of [Homebrew](https://brew.sh/) and
-[kerl](https://github.com/kerl/kerl), as well as some 3rd party actions. For security reasons, we
+[kerl](/kerl/kerl), as well as some 3rd party actions. For security reasons, we
 aim to stop depending on these in the future.
 
 ### Documentation chunks
@@ -53,18 +53,18 @@ Read more about GitHub-hosted runners in the
 
 ### Changelog
 
-A complete changelog can be found under [CHANGELOG.md](https://github.com/jelly-beam/otp-macos/blob/main/CHANGELOG.md).
+A complete changelog can be found under [CHANGELOG.md](/jelly-beam/otp-macos/blob/main/CHANGELOG.md).
 
 ### Code of Conduct
 
-This project's code of conduct is made explicit in [CODE_OF_CONDUCT.md](https://github.com/jelly-beam/otp-macos/blob/main/CODE_OF_CONDUCT.md).
+This project's code of conduct is made explicit in [CODE_OF_CONDUCT.md](/jelly-beam/otp-macos/blob/main/CODE_OF_CONDUCT.md).
 
 ### Contributing
 
 First of all, thank you for contributing with your time and patience.
 
 If you want to request a new feature make sure to
-[open an issue](https://github.com/jelly-beam/otp-macos/issues) so we can
+[open an issue](/jelly-beam/otp-macos/issues) so we can
 discuss it first.
 
 Bug reports and questions are also welcome, but do check you're using the latest version of the
@@ -74,12 +74,12 @@ might have already been answered before.
 Contributions will be subject to the MIT License.
 You will retain the copyright.
 
-For more information check out [CONTRIBUTING.md](https://github.com/jelly-beam/otp-macos/blob/main/CONTRIBUTING.md).
+For more information check out [CONTRIBUTING.md](/jelly-beam/otp-macos/blob/main/CONTRIBUTING.md).
 
 ### License
 
-License information can be found inside [LICENSE](https://github.com/jelly-beam/otp-macos/blob/main/LICENSE).
+License information can be found inside [LICENSE](/jelly-beam/otp-macos/blob/main/LICENSE).
 
 ### Security
 
-This project's security policy is made explicit in [SECURITY.md](https://github.com/jelly-beam/otp-macos/blob/main/SECURITY.md).
+This project's security policy is made explicit in [SECURITY.md](/jelly-beam/otp-macos/blob/main/SECURITY.md).
