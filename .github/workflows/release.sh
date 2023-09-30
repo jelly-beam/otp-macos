@@ -227,6 +227,7 @@ _releases_update() {
         pr=$(gh pr create -B main -t "[automation] ${commit_msg}" -b "🔒 tight, tight, tight!")
         gh pr merge "${pr}" -s
         git switch main
+        git pull
     else
         echo "Skipping branch ${GITHUB_REF_NAME} (runs in main alone)"
     fi
