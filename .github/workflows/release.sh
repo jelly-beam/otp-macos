@@ -112,7 +112,7 @@ kerl_configure
 echo "::endgroup::"
 
 pick_otp_vsn() {
-    local otp_vsn=undefined
+    global_OTP_VSN=undefined
     local oldest_supported=undefined
     local kerl_releases
     kerl_releases=$(./kerl list releases all)
@@ -148,21 +148,20 @@ pick_otp_vsn() {
             fi
             popd || exit 1
 
-            otp_vsn=${release}
+            global_OTP_VSN=${release}
             break
         fi
     done <<<"${kerl_releases}"
-    if [[ "${otp_vsn}" == undefined ]]; then
+    if [[ "${global_OTP_VSN}" == undefined ]]; then
         echo "  Nothing to build. Exiting..."
         echo "::endgroup::"
         exit 0
     fi
-    echo "  picked OTP ${otp_vsn}"
-    echo "${otp_vsn}"
+    echo "  picked OTP ${global_OTP_VSN}"
 }
 echo "::group::Erlang/OTP: pick version to build"
 cd_kerl_dir
-otp_vsn=$(pick_otp_vsn)
+pick_otp_vsn
 echo "::endgroup::"
 
 kerl_build_install() {
@@ -172,7 +171,7 @@ kerl_build_install() {
 }
 echo "::group::kerl: build-install"
 cd_kerl_dir
-kerl_build_install "${otp_vsn}"
+kerl_build_install "${global_OTP_VSN}"
 echo "::endgroup::"
 
 kerl_test() {
@@ -197,7 +196,7 @@ release_prepare() {
 }
 echo "::group::Release: prepare"
 cd_install_dir
-release_prepare "${otp_vsn}"
+release_prepare "${global_OTP_VSN}"
 echo "::endgroup::"
 
 releases_update() {
@@ -234,7 +233,7 @@ releases_update() {
 }
 echo "::group::_RELEASES: update"
 cd_initial_dir
-releases_update "${otp_vsn}"
+releases_update "${global_OTP_VSN}"
 echo "::endgroup::"
 
 config_build_outputs() {
@@ -260,5 +259,5 @@ config_build_outputs() {
 }
 echo "::group::Configure and build: outputs"
 cd_initial_dir
-config_build_outputs "${otp_vsn}"
+config_build_outputs "${global_OTP_VSN}"
 echo "::endgroup::"
