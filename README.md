@@ -36,7 +36,7 @@ File `_RELEASES` will contain the available `.tar.gz` packages, as well as the e
 
 where:
 
-* `vsn` (the name of the file with the build), is `macos64-${macos_vsn}_OTP-${otp_vsn}` (similar
+- `vsn` (the name of the file with the build), is `macos64-${macos_vsn}_OTP-${otp_vsn}` (similar
 to the tag, but notice the `_` instead of the `/`)
 
 Finally, we also include a `.sha256.txt` in releases, for consumers to verify the origin of the
