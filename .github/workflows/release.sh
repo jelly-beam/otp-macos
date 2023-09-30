@@ -1,5 +1,4 @@
 #!/bin/bash
-#shellcheck disable=SC2312  # Consider invoking this command separately to avoid masking its return value
 #shellcheck disable=SC2154  # $VAR is referenced but not assigned
 
 global_MACOS_VSN=$1
@@ -8,7 +7,7 @@ global_INSTALL_DIR=${RUNNER_TEMP}/otp
 # Helper functions
 
 cd_install_dir() {
-    cd "${global_INSTALL_DIR}" || exit
+    cd "${global_INSTALL_DIR}" || exit 1
 }
 
 set_initial_dir() {
@@ -16,7 +15,7 @@ set_initial_dir() {
 }
 
 cd_initial_dir() {
-    cd "${global_INITIAL_DIR}" || exit
+    cd "${global_INITIAL_DIR}" || exit 1
 }
 
 set_kerl_dir() {
@@ -24,55 +23,61 @@ set_kerl_dir() {
 }
 
 cd_kerl_dir() {
-    cd "${global_KERL_DIR}" || exit
+    cd "${global_KERL_DIR}" || exit 1
 }
 
-prepare_git_tag() {
-    local otp_vsn=$1
+git_tag_for() {
+    # $1: OTP version
 
     # The format used for the Git tags
-    global_GIT_TAG=macos64-${global_MACOS_VSN}/OTP-${otp_vsn}
+    echo "macos64-${global_MACOS_VSN}/OTP-$1"
 }
 
-prepare_filename_no_ext() {
-    local otp_vsn=$1
+filename_no_ext_for() {
+    # $1: OTP version
 
     # The format used for the generated filenames
-    global_FILENAME_NO_EXT=macos64-${global_MACOS_VSN}_OTP-${otp_vsn}
+    echo "macos64-${global_MACOS_VSN}_OTP-$1"
 }
 
-prepare_filename_tar_gz() {
-    local otp_vsn=$1
+filename_tar_gz_for() {
+    # $1: OTP version
 
-    prepare_filename_no_ext "${otp_vsn}"
-    global_FILENAME_TAR_GZ=${global_FILENAME_NO_EXT}.tar.gz
+    local filename_no_ext
+    filename_no_ext=$(filename_no_ext_for "$1")
+    echo "${filename_no_ext}.tar.gz"
 }
 
-prepare_filename_sha256_txt() {
-    local otp_vsn=$1
+filename_sha256_txt_for() {
+    # $1: OTP version
 
-    prepare_filename_no_ext "${otp_vsn}"
-    global_FILENAME_SHA256_TXT=${global_FILENAME_NO_EXT}.sha256.txt
+    local filename_no_ext
+    filename_no_ext=$(filename_no_ext_for "$1")
+    echo "${filename_no_ext}.sha256.txt"
 }
 
-prepare_tar_gz_path() {
-    local otp_vsn=$1
+tar_gz_path_for() {
+    # $1: OTP version
 
-    prepare_filename_tar_gz "${otp_vsn}"
-    global_TAR_GZ_PATH=${global_INSTALL_DIR}/${global_FILENAME_TAR_GZ}
+    local filename_tar_gz
+    filename_tar_gz=$(filename_tar_gz_for "$1")
+    echo "${global_INSTALL_DIR}/${filename_tar_gz}"
 }
 
-prepare_sha256_txt_path() {
-    local otp_vsn=$1
+sha256_txt_path_for() {
+    # $1: OTP version
 
-    prepare_filename_sha256_txt "${otp_vsn}"
-    global_SHA256_TXT_PATH=${global_INSTALL_DIR}/${global_FILENAME_SHA256_TXT}
+    local filename_sha256_txt
+    filename_sha256_txt=$(filename_sha256_txt_for "$1")
+    echo "${global_INSTALL_DIR}/${filename_sha256_txt}"
 }
 
 # Workflow groups
 
 homebrew_install() {
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    local install_sh
+    install_sh=$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)
+    /bin/bash -c "${install_sh}"
 }
 echo "::group::Homebrew: install"
 homebrew_install
@@ -81,7 +86,7 @@ echo "::endgroup::"
 
 kerl_checkout() {
     git clone https://github.com/kerl/kerl
-    cd kerl || exit
+    cd kerl || exit 1
 }
 echo "::group::kerl: checkout"
 kerl_checkout
@@ -97,7 +102,9 @@ kerl_configure() {
     KERL_BUILD_DOCS=yes
     export KERL_BUILD_DOCS
 
-    echo OpenSSL is "$(openssl version)"
+    local openssl_version
+    openssl_version=$(openssl version)
+    echo OpenSSL is "${openssl_version}"
 }
 echo "::group::kerl: configure"
 cd_kerl_dir
@@ -106,37 +113,47 @@ echo "::endgroup::"
 
 pick_otp_vsn() {
     global_OTP_VSN=undefined
+    local oldest_supported=undefined
+    local kerl_releases
+    kerl_releases=$(./kerl list releases all)
+    local kerl_releases_reversed
+    kerl_releases_reversed=$(echo "${kerl_releases}" | sort -r)
     while read -r release; do
         if [[ ${release} =~ ^[0-9].*$ ]]; then
-            high=${release%%.*}
+            local high=${release%%.*}
             echo "  Found latest major version to be ${high}"
             oldest_supported=$((high - 2))
-            echo "  thus the oldest support version (per our support policy is) ${oldest_supported}"
+            echo "    thus the oldest support version (per our support policy) is ${oldest_supported}"
             break
         fi
-    done < <(./kerl list releases all | sort -r)
+    done <<<"${kerl_releases_reversed}"
 
     while read -r release; do
         if [[ ${release} =~ ^[0-9].*$ ]]; then
-            major=${release%%.*}
+            local major=${release%%.*}
+            if [[ ${oldest_supported} == undefined ]]; then
+                echo "  Couldn't determine oldest support version. Exiting..."
+                exit 1
+            fi
             if [[ ${major} -lt ${oldest_supported} ]]; then
                 continue
             fi
 
-            prepare_filename_no_ext "${release}"
-
-            pushd "${global_INITIAL_DIR}" || exit
-            if test -f _RELEASES && grep "${global_FILENAME_NO_EXT} " _RELEASES; then
+            local filename_no_ext
+            filename_no_ext=$(filename_no_ext_for "${release}")
+            pushd "${global_INITIAL_DIR}" || exit 1
+            echo "  Searching for ${filename_no_ext} in _RELEASES..."
+            if test -f _RELEASES && grep "${filename_no_ext} " _RELEASES; then
                 continue
             fi
-            popd || exit
+            popd || exit 1
 
             global_OTP_VSN=${release}
             break
         fi
-    done < <(./kerl list releases all)
+    done <<<"${kerl_releases}"
     if [[ "${global_OTP_VSN}" == undefined ]]; then
-        echo "  nothing to build. Exiting..."
+        echo "  Nothing to build. Exiting..."
         echo "::endgroup::"
         exit 0
     fi
@@ -148,11 +165,13 @@ pick_otp_vsn
 echo "::endgroup::"
 
 kerl_build_install() {
-    KERL_DEBUG=true ./kerl build-install "${global_OTP_VSN}" "${global_OTP_VSN}" "${global_INSTALL_DIR}"
+    # $1: OTP version
+
+    KERL_DEBUG=true ./kerl build-install "$1" "$1" "${global_INSTALL_DIR}"
 }
 echo "::group::kerl: build-install"
 cd_kerl_dir
-kerl_build_install
+kerl_build_install "${global_OTP_VSN}"
 echo "::endgroup::"
 
 kerl_test() {
@@ -165,35 +184,46 @@ kerl_test
 echo "::endgroup::"
 
 release_prepare() {
-    prepare_filename_tar_gz "${global_OTP_VSN}"
-    prepare_filename_sha256_txt "${global_OTP_VSN}"
+    # $1: OTP version
 
-    tar -vzcf "${global_FILENAME_TAR_GZ}" ./*
-    shasum -a 256 "${global_FILENAME_TAR_GZ}" >"${global_FILENAME_SHA256_TXT}"
+    local filename_tar_gz
+    filename_tar_gz=$(filename_tar_gz_for "$1")
+    local filename_sha256_txt
+    filename_sha256_txt=$(filename_sha256_txt_for "$1")
+
+    tar -vzcf "${filename_tar_gz}" ./*
+    shasum -a 256 "${filename_tar_gz}" >"${filename_sha256_txt}"
 }
 echo "::group::Release: prepare"
 cd_install_dir
-release_prepare
+release_prepare "${global_OTP_VSN}"
 echo "::endgroup::"
 
 _releases_update() {
-    if [[ "${GITHUB_REF_NAME}" == main ]]; then
-        prepare_filename_no_ext "${global_OTP_VSN}"
-        prepare_tar_gz_path "${global_OTP_VSN}"
+    # $1: OTP version
 
-        crc32=$(crc32 "${global_TAR_GZ_PATH}")
+    if [[ "${GITHUB_REF_NAME}" == main ]]; then
+        local filename_no_ext
+        filename_no_ext=$(filename_no_ext_for "$1")
+        local tar_gz_path
+        tar_gz_path=$(tar_gz_path_for "$1")
+
+        local crc32
+        crc32=$(crc32 "${tar_gz_path}")
+        local date
         date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-        echo "${global_FILENAME_NO_EXT} ${crc32} ${date}" >>_RELEASES
+        echo "${filename_no_ext} ${crc32} ${date}" >>_RELEASES
         sort -o _RELEASES _RELEASES
 
-        release_name="release/${global_FILENAME_NO_EXT}"
+        local release_name="release/${filename_no_ext}"
         git config user.name "GitHub Actions"
         git config user.email "actions@user.noreply.github.com"
         git switch -c "${release_name}"
         git add _RELEASES
-        commit_msg="Update _RELEASES: add ${global_FILENAME_NO_EXT}"
+        local commit_msg="Update _RELEASES: add ${filename_no_ext}"
         git commit -m "${commit_msg}"
         git push origin "${release_name}"
+        local pr
         pr=$(gh pr create -B main -t "[automation] ${commit_msg}" -b "🔒 tight, tight, tight!")
         gh pr merge "${pr}" -s
         git switch main
@@ -203,24 +233,31 @@ _releases_update() {
 }
 echo "::group::_RELEASES: update"
 cd_initial_dir
-_releases_update
+_releases_update "${global_OTP_VSN}"
 echo "::endgroup::"
 
 config_build_outputs() {
-    prepare_tar_gz_path "${global_OTP_VSN}"
-    prepare_sha256_txt_path "${global_OTP_VSN}"
-    prepare_git_tag "${global_OTP_VSN}"
+    # $1: OTP version
+
+    local tar_gz_path
+    tar_gz_path=$(tar_gz_path_for "$1")
+    local sha256_txt_path
+    sha256_txt_path=$(sha256_txt_path_for "$1")
+    local git_tag
+    git_tag=$(git_tag_for "$1")
 
     {
-        echo "otp_vsn=${global_OTP_VSN}"
-        echo "tar_gz=${global_TAR_GZ_PATH}"
-        echo "sha256_txt=${global_SHA256_TXT_PATH}"
-        echo "git_tag=${global_GIT_TAG}"
-        echo "target_commitish=$(git log -n 1 --pretty=format:"%H")"
+        echo "otp_vsn=$1"
+        echo "tar_gz=${tar_gz_path}"
+        echo "sha256_txt=${sha256_txt_path}"
+        echo "git_tag=${git_tag}"
+        local target_commitish
+        target_commitish=$(git log -n 1 --pretty=format:"%H")
+        echo "target_commitish=${target_commitish}"
     } >>"${GITHUB_OUTPUT}"
     cat "${GITHUB_OUTPUT}"
 }
 echo "::group::Configure and build: outputs"
 cd_initial_dir
-config_build_outputs
+config_build_outputs "${global_OTP_VSN}"
 echo "::endgroup::"
