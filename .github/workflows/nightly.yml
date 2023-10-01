@@ -29,7 +29,7 @@ jobs:
           ref: ${{github.ref_name}}
 
       - name: Configure and build
-        timeout-minutes: 20
+        timeout-minutes: 60
         id: config_build
         run: |
           ./.github/workflows/release.sh ${{matrix.macos-vsn}} ${{matrix.otp-vsn}}
