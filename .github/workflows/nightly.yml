@@ -1,5 +1,5 @@
 ---
-name: Release (nightly master and maint)
+name: Release (nightly)
 
 "on":
   schedule:
@@ -11,7 +11,7 @@ name: Release (nightly master and maint)
 
 jobs:
   release:
-    name: Release (nightly master and maint)
+    name: Release (nightly)
 
     strategy:
       matrix:
