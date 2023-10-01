@@ -15,12 +15,12 @@ jobs:
 
     strategy:
       matrix:
-        macos-vsn: ["11", "12", "13"]
+        darwin64-vsn: ["11", "12", "13"]
         otp-vsn: ["master", "maint"]  # The same as is_nightly_otp_for, in release.sh
       fail-fast: true
       max-parallel: 1
 
-    runs-on: macos-${{matrix.macos-vsn}}
+    runs-on: macos-${{matrix.darwin64-vsn}}
 
     steps:
       - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac  # v4.0.0
@@ -32,7 +32,7 @@ jobs:
         timeout-minutes: 60
         id: config_build
         run: |
-          ./.github/workflows/release.sh ${{matrix.macos-vsn}} ${{matrix.otp-vsn}}
+          ./.github/workflows/release.sh ${{matrix.darwin64-vsn}} ${{matrix.otp-vsn}}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -42,7 +42,7 @@ jobs:
           body: >
             This is
             Erlang/OTP ${{steps.config_build.outputs.otp_vsn}} compiled for
-            macOS ${{matrix.macos-vsn}} (64 bit).
+            Darwin ${{matrix.darwin64-vsn}} (64 bit).
           files: |
             ${{steps.config_build.outputs.tar_gz}}
             ${{steps.config_build.outputs.sha256_txt}}
