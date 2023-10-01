@@ -143,11 +143,13 @@ pick_otp_vsn() {
             local filename_no_ext
             filename_no_ext=$(filename_no_ext_for "${release}")
             pushd "${global_INITIAL_DIR}" || exit 1
-            echo "  Searching for ${filename_no_ext} in _RELEASES..."
+            echo "  Searched for ${filename_no_ext} in _RELEASES..."
             if test -f _RELEASES && grep "${filename_no_ext} " _RELEASES; then
+            echo "    and found it. Continuing search..."
                 continue
             fi
             popd || exit 1
+            echo "    and didn't find it"
 
             global_OTP_VSN=${release}
             break
