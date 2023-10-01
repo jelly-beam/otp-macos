@@ -104,7 +104,7 @@ kerl_configure() {
 
     local openssl_version
     openssl_version=$(openssl version)
-    echo OpenSSL is "${openssl_version}"
+    echo "OpenSSL is ${openssl_version}"
 }
 echo "::group::kerl: configure"
 cd_kerl_dir
@@ -113,11 +113,16 @@ echo "::endgroup::"
 
 pick_otp_vsn() {
     global_OTP_VSN=undefined
+
     local oldest_supported=undefined
+
     local kerl_releases
     kerl_releases=$(./kerl list releases all)
+
     local kerl_releases_reversed
     kerl_releases_reversed=$(echo "${kerl_releases}" | sort -r)
+
+    # Search for oldest supported version from latest available
     while read -r release; do
         # Avoid release candidates, while searching for latest
         if [[ ${release} =~ ^[0-9].*$ ]] && ! [[ ${release} =~ -rc ]]; then
@@ -129,6 +134,7 @@ pick_otp_vsn() {
         fi
     done <<<"${kerl_releases_reversed}"
 
+    # Search for a version to apply the pipeline to
     while read -r release; do
         if [[ ${release} =~ ^[0-9].*$ ]]; then
             local major=${release%%.*}
@@ -136,15 +142,21 @@ pick_otp_vsn() {
                 echo "Couldn't determine oldest support version. Exiting..."
                 exit 1
             fi
+
             if [[ ${major} -lt ${oldest_supported} ]]; then
                 continue
             fi
 
             local filename_no_ext
             filename_no_ext=$(filename_no_ext_for "${release}")
+
             pushd "${global_INITIAL_DIR}" >/dev/null || exit 1
-            if test -f _RELEASES && grep "${filename_no_ext} " _RELEASES; then
-                continue
+            if [[ -f _RELEASES ]]; then
+                local found
+                found=$(grep "${filename_no_ext} " _RELEASES)
+                if [[ -n "${found}" ]]; then
+                    continue
+                fi
             fi
             popd >/dev/null || exit 1
 
@@ -152,6 +164,7 @@ pick_otp_vsn() {
             break
         fi
     done <<<"${kerl_releases}"
+
     if [[ "${global_OTP_VSN}" == undefined ]]; then
         echo "Nothing to build. Exiting..."
         echo "::endgroup::"
@@ -162,6 +175,7 @@ pick_otp_vsn() {
 echo "::group::Erlang/OTP: pick version to build"
 cd_kerl_dir
 pick_otp_vsn
+echo "  Picked OTP ${global_OTP_VSN}"
 echo "::endgroup::"
 
 kerl_build_install() {
@@ -188,6 +202,7 @@ release_prepare() {
 
     local filename_tar_gz
     filename_tar_gz=$(filename_tar_gz_for "$1")
+
     local filename_sha256_txt
     filename_sha256_txt=$(filename_sha256_txt_for "$1")
 
@@ -205,11 +220,13 @@ _releases_update() {
     if [[ "${GITHUB_REF_NAME}" == main ]]; then
         local filename_no_ext
         filename_no_ext=$(filename_no_ext_for "$1")
+
         local tar_gz_path
         tar_gz_path=$(tar_gz_path_for "$1")
 
         local crc32
         crc32=$(crc32 "${tar_gz_path}")
+
         local date
         date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
         echo "${filename_no_ext} ${crc32} ${date}" >>_RELEASES
@@ -242,18 +259,21 @@ config_build_outputs() {
 
     local tar_gz_path
     tar_gz_path=$(tar_gz_path_for "$1")
+
     local sha256_txt_path
     sha256_txt_path=$(sha256_txt_path_for "$1")
+
     local git_tag
     git_tag=$(git_tag_for "$1")
+
+    local target_commitish
+    target_commitish=$(git log -n 1 --pretty=format:"%H")
 
     {
         echo "otp_vsn=$1"
         echo "tar_gz=${tar_gz_path}"
         echo "sha256_txt=${sha256_txt_path}"
         echo "git_tag=${git_tag}"
-        local target_commitish
-        target_commitish=$(git log -n 1 --pretty=format:"%H")
         echo "target_commitish=${target_commitish}"
     } >>"${GITHUB_OUTPUT}"
     cat "${GITHUB_OUTPUT}"
