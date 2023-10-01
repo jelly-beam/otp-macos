@@ -269,6 +269,9 @@ _releases_update() {
                 sed -i -e "s|${filename_no_ext} \(.*\)|${filename_no_ext} ${crc32} ${date}|g" _RELEASES
             fi
 
+            local git_tag
+            git_tag=$(git_tag_for "$1")
+            gh release delete "${git_tag}" --cleanup-tag --yes
             git branch -D "${release_name}"
             git push origin --delete "${release_name}"
             update_releases_prefix="replace"
