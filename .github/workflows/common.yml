@@ -1,28 +1,24 @@
 ---
-name: Release
+name: Common
 
 "on":
-  schedule:
-    - cron: 0 */2 * * *
-  workflow_dispatch:
-  push:
-    branches-ignore:
-      - main
+  workflow_call:
+    inputs:
+      macos-vsn:
+        required: true
+        type: string
+      otp-vsn:
+        required: false
+        type: string
 
 jobs:
   release:
-    name: Release
+    name: Common
 
-    strategy:
-      matrix:
-        darwin64-vsn: ["11", "12", "13"]
-      fail-fast: true
-      max-parallel: 1
-
-    runs-on: macos-${{matrix.darwin64-vsn}}
+    runs-on: macos-${{inputs.macos-vsn}}
 
     steps:
-      - uses: ./github/workflows/common.yml
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac  # v4.0.0
         with:
           # We want jobs to always checkout the updated branch
           ref: ${{github.ref_name}}
@@ -31,9 +27,9 @@ jobs:
         timeout-minutes: 60
         id: config_build
         run: |
-          ./.github/workflows/release.sh ${{matrix.darwin64-vsn}}
+          ./.github/workflows/release.sh ${{inputs.macos-vsn}} ${{inputs.otp-vsn}}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844  # v1
@@ -41,11 +37,10 @@ jobs:
           body: >
             This is
             Erlang/OTP ${{steps.config_build.outputs.otp_vsn}} compiled for
-            Darwin ${{matrix.darwin64-vsn}} (64 bit).
+            macOS ${{inputs.macos-vsn}} (64 bit).
           files: |
             ${{steps.config_build.outputs.tar_gz}}
             ${{steps.config_build.outputs.sha256_txt}}
           tag_name: ${{steps.config_build.outputs.git_tag}}
           target_commitish: ${{steps.config_build.outputs.target_commitish}}
-        if: "${{github.ref == 'refs/heads/main' &&
-             steps.config_build.outputs.target_commitish != ''}}"
+        if: ${{github.ref == 'refs/heads/main'}}

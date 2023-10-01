@@ -23,29 +23,7 @@ jobs:
     runs-on: macos-${{matrix.macos-vsn}}
 
     steps:
-      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac  # v4.0.0
+      - uses: ./github/workflows/common.yml
         with:
-          # We want jobs to always checkout the updated branch
-          ref: ${{github.ref_name}}
-
-      - name: Configure and build
-        timeout-minutes: 60
-        id: config_build
-        run: |
-          ./.github/workflows/release.sh ${{matrix.macos-vsn}} ${{matrix.otp-vsn}}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Release
-        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844  # v1
-        with:
-          body: >
-            This is
-            Erlang/OTP ${{steps.config_build.outputs.otp_vsn}} compiled for
-            macOS ${{matrix.macos-vsn}} (64 bit).
-          files: |
-            ${{steps.config_build.outputs.tar_gz}}
-            ${{steps.config_build.outputs.sha256_txt}}
-          tag_name: ${{steps.config_build.outputs.git_tag}}
-          target_commitish: ${{steps.config_build.outputs.target_commitish}}
-        if: ${{github.ref == 'refs/heads/main'}}
+          macos-vsn: ${{matrix.macos-vsn}}
+          otp-vsn: ${{matrix.otp-vsn}}
