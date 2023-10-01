@@ -123,10 +123,8 @@ kerl_configure() {
     export KERL_BUILD_DOCS
 
     export_kerl_configuration_option "--disable-dynamic-ssl-lib"
-    local openssl
-    openssl=$(command -v openssl)
     local with_ssl
-    with_ssl="$(dirname "$(dirname "${openssl}")")"
+    with_ssl="$(brew --prefix openssl@1.1)"
     export_kerl_configuration_option "--with-ssl=${with_ssl}"
 
     local openssl_version
