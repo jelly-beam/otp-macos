@@ -119,10 +119,11 @@ pick_otp_vsn() {
     local kerl_releases_reversed
     kerl_releases_reversed=$(echo "${kerl_releases}" | sort -r)
     while read -r release; do
-        if [[ ${release} =~ ^[0-9].*$ ]]; then
-            local high=${release%%.*}
-            echo "  Found latest major version to be ${high}"
-            oldest_supported=$((high - 2))
+        # Avoid release candidates, while searching for latest
+        if [[ ${release} =~ ^[0-9].*$ ]] && ! [[ ${release} =~ -rc ]]; then
+            local latest=${release%%.*}
+            echo "  Found latest major version to be ${latest}"
+            oldest_supported=$((latest - 2))
             echo "    thus the oldest support version (per our support policy) is ${oldest_supported}"
             break
         fi
@@ -142,11 +143,13 @@ pick_otp_vsn() {
             local filename_no_ext
             filename_no_ext=$(filename_no_ext_for "${release}")
             pushd "${global_INITIAL_DIR}" || exit 1
-            echo "  Searching for ${filename_no_ext} in _RELEASES..."
+            echo "  Searched for ${filename_no_ext} in _RELEASES..."
             if test -f _RELEASES && grep "${filename_no_ext} " _RELEASES; then
+            echo "    and found it. Continuing search..."
                 continue
             fi
             popd || exit 1
+            echo "    and didn't find it"
 
             global_OTP_VSN=${release}
             break
