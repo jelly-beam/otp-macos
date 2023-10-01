@@ -1,9 +1,9 @@
 # `otp-macos` [![Release][release-img]][release] [![Nightly][nightly-img]][nightly]
 
-[release]: https://github.com/jelly-beam/otp-macos/actions/workflows/release.yml
-[release-img]: https://github.com/jelly-beam/otp-macos/actions/workflows/release.yml/badge.svg
-[nightly]: https://github.com/jelly-beam/otp-macos/actions/workflows/nightly.yml
-[nightly-img]: https://github.com/jelly-beam/otp-macos/actions/workflows/nightly.yml/badge.svg
+[release]: https://github.com/jelly-beam/otp-macos/actions/workflows/release.yml?query=branch%3Amain
+[release-img]: https://github.com/jelly-beam/otp-macos/actions/workflows/release.yml/badge.svg?branch=main
+[nightly]: https://github.com/jelly-beam/otp-macos/actions/workflows/nightly.yml?query=branch%3Amain
+[nightly-img]: https://github.com/jelly-beam/otp-macos/actions/workflows/nightly.yml/badge.svg?branch=main
 
 `otp-macos` is a living, and up-to-date, collection of precompiled macOS-ready Erlang/OTP versions.
 
