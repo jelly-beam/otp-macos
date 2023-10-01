@@ -1,7 +1,7 @@
 #!/bin/bash
 #shellcheck disable=SC2154  # $VAR is referenced but not assigned
 
-global_MACOS_VSN=$1
+global_DARWIN64_VSN=$1
 global_INSTALL_DIR=${RUNNER_TEMP}/otp
 
 # Helper functions
@@ -30,14 +30,14 @@ git_tag_for() {
     # $1: OTP version
 
     # The format used for the Git tags
-    echo "macos64-${global_MACOS_VSN}/OTP-$1"
+    echo "darwin64-${global_DARWIN64_VSN}/OTP-$1"
 }
 
 filename_no_ext_for() {
     # $1: OTP version
 
     # The format used for the generated filenames
-    echo "macos64-${global_MACOS_VSN}_OTP-$1"
+    echo "darwin64-${global_DARWIN64_VSN}_OTP-$1"
 }
 
 filename_tar_gz_for() {
