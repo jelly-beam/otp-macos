@@ -1,5 +1,5 @@
 ---
-name: Release (nightly)
+name: Nightly
 
 "on":
   schedule:
@@ -11,7 +11,7 @@ name: Release (nightly)
 
 jobs:
   release:
-    name: Release (nightly)
+    name: Nightly
 
     strategy:
       matrix:

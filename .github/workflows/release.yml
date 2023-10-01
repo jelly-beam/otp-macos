@@ -1,5 +1,5 @@
 ---
-name: Release (tagged versions)
+name: Release
 
 "on":
   schedule:
@@ -11,7 +11,7 @@ name: Release (tagged versions)
 
 jobs:
   release:
-    name: Release (tagged versions)
+    name: Release
 
     strategy:
       matrix:
