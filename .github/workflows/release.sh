@@ -2,6 +2,7 @@
 #shellcheck disable=SC2154  # $VAR is referenced but not assigned
 
 global_DARWIN64_VSN=$1
+global_OTP_VSN=$2
 global_INSTALL_DIR=${RUNNER_TEMP}/otp
 
 # Helper functions
@@ -70,6 +71,18 @@ sha256_txt_path_for() {
     local filename_sha256_txt
     filename_sha256_txt=$(filename_sha256_txt_for "$1")
     echo "${global_INSTALL_DIR}/${filename_sha256_txt}"
+}
+
+is_nightly_otp_for() {
+    # $1: OTP version
+
+    local nightly_otp_targets
+    nightly_otp_targets=("master" "maint")
+    if [[ ${nightly_otp_targets[*]} =~ $1 ]]; then
+        echo true
+    else
+        echo false
+    fi
 }
 
 # Workflow groups
@@ -174,14 +187,21 @@ pick_otp_vsn() {
 }
 echo "::group::Erlang/OTP: pick version to build"
 cd_kerl_dir
-pick_otp_vsn
+global_IS_NIGHTLY_OTP=$(is_nightly_otp_for "${global_OTP_VSN}")
+if [[ ${global_IS_NIGHTLY_OTP} == false ]]; then
+    pick_otp_vsn
+fi
 echo "  Picked OTP ${global_OTP_VSN}"
 echo "::endgroup::"
 
 kerl_build_install() {
     # $1: OTP version
 
-    KERL_DEBUG=true ./kerl build-install "$1" "$1" "${global_INSTALL_DIR}"
+    if [[ ${global_IS_NIGHTLY_OTP} == false ]]; then
+        KERL_DEBUG=true ./kerl build-install "$1" "$1" "${global_INSTALL_DIR}"
+    else
+        KERL_DEBUG=true ./kerl build-install git https://github.com/erlang/otp.git "$1" "$1" "${global_INSTALL_DIR}"
+    fi
 }
 echo "::group::kerl: build-install"
 cd_kerl_dir
@@ -229,22 +249,49 @@ _releases_update() {
 
         local date
         date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-        echo "${filename_no_ext} ${crc32} ${date}" >>_RELEASES
-        sort -o _RELEASES _RELEASES
 
-        local release_name="release/${filename_no_ext}"
+        local _releases_created=false
+        if [[ ! -f _RELEASES ]]; then
+            echo "${filename_no_ext} ${crc32} ${date}" >_RELEASES
+            _releases_created=true
+        fi
+
         git config user.name "GitHub Actions"
         git config user.email "actions@user.noreply.github.com"
+
+        local update_releases_prefix
+        local release_name="release/${filename_no_ext}"
+        if [[ ${global_IS_NIGHTLY_OTP} == false ]]; then
+            update_releases_prefix="add"
+        else
+            if [[ ${_releases_created} == false ]]; then
+                # Replace (inline) in previously existing file (this is a special target)
+                sed -i -e "s|${filename_no_ext} \(.*\)|${filename_no_ext} ${crc32} ${date}|g" _RELEASES
+            fi
+
+            git branch -D "${release_name}"
+            git push origin --delete "${release_name}"
+            update_releases_prefix="replace"
+        fi
+        sort -o _RELEASES _RELEASES
+
         git switch -c "${release_name}"
         git add _RELEASES
-        local commit_msg="Update _RELEASES: add ${filename_no_ext}"
+
+        local commit_msg="Update _RELEASES: ${update_releases_prefix} ${filename_no_ext}"
         git commit -m "${commit_msg}"
         git push origin "${release_name}"
-        local pr
-        pr=$(gh pr create -B main -t "[automation] ${commit_msg}" -b "🔒 tight, tight, tight!")
-        gh pr merge "${pr}" -s
-        git switch main
-        git pull # Otherwise the pr merge commit is not picked up
+
+        # A non-nightly version gets updated in the main branch
+        # A nightly version gets updated in a special (moving target) branch
+        if [[ ${global_IS_NIGHTLY_OTP} == false ]]; then
+            local pr
+            pr=$(gh pr create -B main -t "[automation] ${commit_msg}" -b "🔒 tight, tight, tight!")
+            gh pr merge "${pr}" -s
+            git switch main
+        fi
+
+        git pull # Otherwise the latest commit is not picked up
     else
         echo "Skipping branch ${GITHUB_REF_NAME} (runs in main alone)"
     fi
