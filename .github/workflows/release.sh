@@ -249,23 +249,29 @@ _releases_update() {
         local date
         date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-        local _releases_created=false
-        if [[ ! -f _RELEASES ]]; then
-            echo "${filename_no_ext} ${crc32} ${date}" >_RELEASES
-            _releases_created=true
+        local found
+        found=$(grep "${filename_no_ext} " _RELEASES)
+
+        local _releases_updated=false
+        if [[ -n "${found}" ]]; then
+            # This should never happen for non-nightly, since a previous check
+            #   makes sure we choose a different version
+            echo "${filename_no_ext} ${crc32} ${date}" >>_RELEASES
+            _releases_updated=true
         fi
 
         git config user.name "GitHub Actions"
         git config user.email "actions@user.noreply.github.com"
 
         local update_releases_prefix
+        update_releases_prefix="add"
+
         local release_name="release/${filename_no_ext}"
-        if [[ ${global_IS_NIGHTLY_OTP} == false ]]; then
-            update_releases_prefix="add"
-        else
-            if [[ ${_releases_created} == false ]]; then
+        if [[ ${global_IS_NIGHTLY_OTP} == true ]]; then
+            if [[ ${_releases_updated} == false ]]; then
                 # Replace (inline) in previously existing file (this is a special target)
                 sed -i -e "s|${filename_no_ext} \(.*\)|${filename_no_ext} ${crc32} ${date}|g" _RELEASES
+                update_releases_prefix="replace"
             fi
 
             # This is not atomic and might fail, but that's the cost of bleeding edge
@@ -274,7 +280,6 @@ _releases_update() {
             gh release delete "${git_tag}" --cleanup-tag --yes
             git branch -D "${release_name}"
             git push origin --delete "${release_name}"
-            update_releases_prefix="replace"
         fi
         sort -o _RELEASES _RELEASES
 
