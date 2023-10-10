@@ -250,26 +250,21 @@ _releases_update() {
         local date
         date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-        local found
-        found=$(grep "${filename_no_ext} " _RELEASES)
-
-        local _releases_updated=false
-        if [[ -n "${found}" ]]; then
-            # This should never happen for non-nightly, since a previous check
-            #   makes sure we choose a different version
+        touch _RELEASES
+        local update_releases_prefix
+        local release_was_found
+        release_was_found=$(grep "${filename_no_ext} " _RELEASES)
+        if [[ -z "${release_was_found}" ]]; then
             echo "${filename_no_ext} ${crc32} ${date}" >>_RELEASES
-            _releases_updated=true
+            update_releases_prefix="add"
         fi
 
         git config user.name "GitHub Actions"
         git config user.email "actions@user.noreply.github.com"
 
-        local update_releases_prefix
-        update_releases_prefix="add"
-
         local release_name="release/${filename_no_ext}"
         if [[ ${global_IS_NIGHTLY_OTP} == true ]]; then
-            if [[ ${_releases_updated} == false ]]; then
+            if [[ -n "${release_was_found}" ]]; then
                 # Replace (inline) in previously existing file (this is a special target)
                 sed -i -e "s|${filename_no_ext} \(.*\)|${filename_no_ext} ${crc32} ${date}|g" _RELEASES
                 update_releases_prefix="replace"
@@ -278,14 +273,15 @@ _releases_update() {
             # This is not atomic and might fail, but that's the cost of bleeding edge
             local git_tag
             git_tag=$(git_tag_for "$1")
-            gh release delete "${git_tag}" --cleanup-tag --yes
-            git branch -D "${release_name}"
-            git push origin --delete "${release_name}"
+            gh release delete "${git_tag}" --cleanup-tag --yes || true
+            git branch -D "${release_name}" || true
+            git push origin --delete "${release_name}" || true
         fi
         sort -o _RELEASES _RELEASES
 
         git switch -c "${release_name}"
         git add _RELEASES
+        rm -rf kerl
 
         local commit_msg="Update _RELEASES: ${update_releases_prefix} ${filename_no_ext}"
         git commit -m "${commit_msg}"
