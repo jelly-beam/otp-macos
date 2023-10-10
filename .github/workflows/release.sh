@@ -183,7 +183,6 @@ pick_otp_vsn() {
         echo "::endgroup::"
         exit 0
     fi
-    echo "Picked OTP ${global_OTP_VSN}"
 }
 echo "::group::Erlang/OTP: pick version to build"
 cd_kerl_dir
@@ -191,7 +190,7 @@ global_IS_NIGHTLY_OTP=$(is_nightly_otp_for "${global_OTP_VSN}")
 if [[ ${global_IS_NIGHTLY_OTP} == false ]]; then
     pick_otp_vsn
 fi
-echo "  Picked OTP ${global_OTP_VSN}"
+echo "Picked OTP ${global_OTP_VSN}"
 echo "::endgroup::"
 
 kerl_build_install() {
@@ -269,6 +268,7 @@ _releases_update() {
                 sed -i -e "s|${filename_no_ext} \(.*\)|${filename_no_ext} ${crc32} ${date}|g" _RELEASES
             fi
 
+            # This is not atomic and might fail, but that's the cost of bleeding edge
             local git_tag
             git_tag=$(git_tag_for "$1")
             gh release delete "${git_tag}" --cleanup-tag --yes
