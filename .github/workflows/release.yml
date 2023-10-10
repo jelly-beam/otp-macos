@@ -47,4 +47,5 @@ jobs:
             ${{steps.config_build.outputs.sha256_txt}}
           tag_name: ${{steps.config_build.outputs.git_tag}}
           target_commitish: ${{steps.config_build.outputs.target_commitish}}
-        if: ${{github.ref == 'refs/heads/main'}}
+        if: "${{github.ref == 'refs/heads/main' &&
+             steps.config_build.outputs.target_commitish != ''}}"
