@@ -122,9 +122,9 @@ pick_otp_vsn() {
         # Avoid release candidates, while searching for latest
         if [[ ${release} =~ ^[0-9].*$ ]] && ! [[ ${release} =~ -rc ]]; then
             local latest=${release%%.*}
-            echo "  Found latest major version to be ${latest}"
+            echo "Found latest major version to be ${latest}"
             oldest_supported=$((latest - 2))
-            echo "    thus the oldest support version (per our support policy) is ${oldest_supported}"
+            echo "  thus the oldest support version (per our support policy) is ${oldest_supported}"
             break
         fi
     done <<<"${kerl_releases_reversed}"
@@ -133,7 +133,7 @@ pick_otp_vsn() {
         if [[ ${release} =~ ^[0-9].*$ ]]; then
             local major=${release%%.*}
             if [[ ${oldest_supported} == undefined ]]; then
-                echo "  Couldn't determine oldest support version. Exiting..."
+                echo "Couldn't determine oldest support version. Exiting..."
                 exit 1
             fi
             if [[ ${major} -lt ${oldest_supported} ]]; then
@@ -143,24 +143,21 @@ pick_otp_vsn() {
             local filename_no_ext
             filename_no_ext=$(filename_no_ext_for "${release}")
             pushd "${global_INITIAL_DIR}" || exit 1
-            echo "  Searched for ${filename_no_ext} in _RELEASES..."
             if test -f _RELEASES && grep "${filename_no_ext} " _RELEASES; then
-            echo "    and found it. Continuing search..."
                 continue
             fi
             popd || exit 1
-            echo "    and didn't find it"
 
             global_OTP_VSN=${release}
             break
         fi
     done <<<"${kerl_releases}"
     if [[ "${global_OTP_VSN}" == undefined ]]; then
-        echo "  Nothing to build. Exiting..."
+        echo "Nothing to build. Exiting..."
         echo "::endgroup::"
         exit 0
     fi
-    echo "  picked OTP ${global_OTP_VSN}"
+    echo "Picked OTP ${global_OTP_VSN}"
 }
 echo "::group::Erlang/OTP: pick version to build"
 cd_kerl_dir
