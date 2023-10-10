@@ -153,6 +153,7 @@ pick_otp_vsn() {
             local major=${release%%.*}
             if [[ ${oldest_supported} == undefined ]]; then
                 echo "Couldn't determine oldest support version. Exiting..."
+                echo "::endgroup::"
                 exit 1
             fi
 
