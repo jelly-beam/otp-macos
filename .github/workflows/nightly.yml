@@ -1,9 +1,9 @@
 ---
-name: Release
+name: Nightly
 
 "on":
   schedule:
-    - cron: 0 */2 * * *
+    - cron: 0 0 * * *
   workflow_dispatch:
   push:
     branches-ignore:
@@ -11,11 +11,12 @@ name: Release
 
 jobs:
   release:
-    name: Release
+    name: Nightly
 
     strategy:
       matrix:
         darwin64-vsn: ["11", "12", "13"]
+        otp-vsn: ["master", "maint"]  # The same as is_nightly_otp_for, in release.sh
       fail-fast: true
       max-parallel: 1
 
@@ -31,7 +32,7 @@ jobs:
         timeout-minutes: 60
         id: config_build
         run: |
-          ./.github/workflows/release.sh ${{matrix.darwin64-vsn}}
+          ./.github/workflows/release.sh ${{matrix.darwin64-vsn}} ${{matrix.otp-vsn}}
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 

@@ -1,7 +1,9 @@
-# `otp-macos` [![Release][release-img]][release]
+# `otp-macos` [![Release][release-img]][release] [![Nightly][nightly-img]][nightly]
 
-[release]: https://github.com/jelly-beam/otp-macos/actions/workflows/release.yml
-[release-img]: https://github.com/jelly-beam/otp-macos/actions/workflows/release.yml/badge.svg
+[release]: https://github.com/jelly-beam/otp-macos/actions/workflows/release.yml?query=branch%3Amain
+[release-img]: https://github.com/jelly-beam/otp-macos/actions/workflows/release.yml/badge.svg?branch=main
+[nightly]: https://github.com/jelly-beam/otp-macos/actions/workflows/nightly.yml?query=branch%3Amain
+[nightly-img]: https://github.com/jelly-beam/otp-macos/actions/workflows/nightly.yml/badge.svg?branch=main
 
 `otp-macos` is a living, and up-to-date, collection of precompiled macOS-ready Erlang/OTP versions.
 
@@ -10,6 +12,11 @@ It was initially created to support macOS on <https://github.com/erlef/setup-bea
 We aim to build all Erlang versions (at most one every 2 hours - for all OS versions) starting from
 Erlang/OTP 24, as per `kerl`'s listing, and targeting macOS for the versions supported by GitHub
 Actions (11, 12, and 13, at the time of this writing).
+
+We also aim to build from `master` and `maint`, nightly, mostly to allow consumers to be on the
+edge, but also to test potential upcoming issues with the image build/release pipeline. These
+versions will remain in (moving target branches) with their copy of `_RELEASES`, but won't see
+an update for their version in the main branch's `_RELEASES`.
 
 ## The build/release pipeline
 
