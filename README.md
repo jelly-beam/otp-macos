@@ -28,6 +28,11 @@ aim to stop depending on these in the future.
 
 The images are built with documentation chunks as per `make docs DOC_TARGETS=chunks`.
 
+### OpenSSL
+
+The images are built with static OpenSSL linking, via
+`--disable-dynamic-ssl-lib --with-ssl=$(command -v openssl)/../..`.
+
 ### Releases
 
 Releases are tagged as `darwin64-${macos_vsn}/OTP-${otp_vsn}`, and available at
