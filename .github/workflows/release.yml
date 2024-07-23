@@ -18,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        darwin64-vsn: ["11", "12", "13"]
+        darwin64-vsn: ["12", "13", "14"]
       fail-fast: true
       max-parallel: 1
 
