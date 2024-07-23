@@ -68,7 +68,7 @@ malicious software into an image you'll later consume. Do that end, we:
 - only use software from sources we trust
 - trust that GitHub Actions (and its runners) are hardened in nature - while we make extra efforts
 to build on top of this
-- are vocal about [security considerations](https://github.com/jelly-beam/otp-macos/issues?q=label%3A%22security+consideration)
+- are vocal about [security considerations](https://github.com/jelly-beam/otp-macos/issues?q=label%3A%22security+consideration%22)
 and open to suggestions for change
 - have a [security policy](https://github.com/jelly-beam/otp-macos/blob/main/SECURITY.md) in place
 - have tweaked the repository's Settings as per GitHub recommendations for security
