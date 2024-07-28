@@ -15,7 +15,7 @@ Actions (11, 12, and 13, at the time of this writing).
 
 We also aim to build from `master` and `maint`, nightly, mostly to allow consumers to be on the
 edge, but also to test potential upcoming issues with the image build/release pipeline. These
-versions will remain in (moving target branches) with their copy of `_RELEASES`, but won't see
+versions will remain in (moving target) branches with their copy of `_RELEASES`, but won't see
 an update for their version in the main branch's `_RELEASES`.
 
 ## The build/release pipeline
@@ -68,7 +68,7 @@ malicious software into an image you'll later consume. Do that end, we:
 - only use software from sources we trust
 - trust that GitHub Actions (and its runners) are hardened in nature - while we make extra efforts
 to build on top of this
-- are vocal about [security considerations](https://github.com/jelly-beam/otp-macos/issues?q=label%3A%22security+consideration)
+- are vocal about [security considerations](https://github.com/jelly-beam/otp-macos/issues?q=label%3A%22security+consideration%22)
 and open to suggestions for change
 - have a [security policy](https://github.com/jelly-beam/otp-macos/blob/main/SECURITY.md) in place
 - have tweaked the repository's Settings as per GitHub recommendations for security
