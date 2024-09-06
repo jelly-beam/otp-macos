@@ -35,7 +35,7 @@ The images are built with static OpenSSL linking, via
 
 ### Releases
 
-Releases are tagged as `darwin64-${macos_vsn}/OTP-${otp_vsn}`, and available at
+Releases are tagged as `darwin-${arch}-${macos_vsn}/OTP-${otp_vsn}`, and available at
 <https://github.com/jelly-beam/otp-macos/releases/> under section Assets. We aim to keep naming
 of the assets consistent as to ease use in CI pipelines.
 
@@ -46,13 +46,19 @@ File `_RELEASES` will contain the available `.tar.gz` packages, as well as the e
 <vsn> <crc32_for_tar_gz> <date_as_utc_%Y-%m-%dT%H:%M:%SZ>
 ```
 
-where `vsn` (the name of the file with the build) is `darwin64-${macos_vsn}_OTP-${otp_vsn}` (similar
+where `vsn` (the name of the file with the build) is `darwin-${arch}-${macos_vsn}_OTP-${otp_vsn}` (similar
 to the tag, but notice the `_` instead of the `/`).
 
 Finally, we also include a `.sha256.txt` in releases, for consumers to verify the origin of the
 files. To do so, run `shasum -a 256 <file>` where `<file>` is the downloaded `.tar.gz` asset,
 then compare the result of that operation to `<file>`'s `.sha256.txt` counterpart. If they're
 different feel free to open an issue in this pull request so we can help investigate further.
+
+#### Architectures
+
+Supported architectures are (from `${arch}`):
+
+- `x86_64`: a 64-bit Intel-based Mac
 
 ### GitHub images
 

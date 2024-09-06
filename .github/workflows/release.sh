@@ -1,9 +1,10 @@
 #!/bin/bash
 #shellcheck disable=SC2154  # $VAR is referenced but not assigned
 
-global_DARWIN64_VSN=$1
+global_DARWIN_VSN=$1
 global_OTP_VSN=$2
 global_INSTALL_DIR=${RUNNER_TEMP}/otp
+global_ARCH=$(uname -m)
 
 # Helper functions
 
@@ -31,14 +32,14 @@ git_tag_for() {
     # $1: OTP version
 
     # The format used for the Git tags
-    echo "darwin64-${global_DARWIN64_VSN}/OTP-$1"
+    echo "darwin-${global_ARCH}-${global_DARWIN_VSN}/OTP-$1"
 }
 
 filename_no_ext_for() {
     # $1: OTP version
 
     # The format used for the generated filenames
-    echo "darwin64-${global_DARWIN64_VSN}_OTP-$1"
+    echo "darwin-${global_ARCH}-${global_DARWIN_VSN}_OTP-$1"
 }
 
 filename_tar_gz_for() {
