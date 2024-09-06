@@ -124,6 +124,7 @@ kerl_configure() {
 
     export_kerl_configuration_option "--disable-dynamic-ssl-lib"
     local with_ssl
+    brew install openssl@3.0
     with_ssl="$(brew --prefix openssl@3.0)"
     export_kerl_configuration_option "--with-ssl=${with_ssl}"
 
@@ -171,7 +172,7 @@ pick_otp_vsn() {
                 exit 1
             fi
 
-            if [[ ${major} -lt ${oldest_supported} ]] || { [[ ${major} -eq 25 ]] && [[ ${minor} -lt 1 ]]; }; then
+            if [[ ${major} -lt ${oldest_supported} ]] || { [[ ${major} -eq 25 ]] && [[ ${minor} -lt 1 ]] || [[ ${minor} -eq "" ]]; }; then
                 continue
             fi
 
