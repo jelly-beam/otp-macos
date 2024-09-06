@@ -32,7 +32,7 @@ jobs:
 
     strategy:
       matrix:
-        darwin64-vsn: ["12", "13", "14"]
+        darwin64-vsn: [12, 13, 14]
       fail-fast: true
       max-parallel: 1
 
@@ -69,7 +69,7 @@ jobs:
 
       - name: Notify on failed build
         uses: jayqi/failed-build-issue-action@1a893bbf43ef1c2a8705e2b115cd4f0fe3c5649b  # v1.2.0
-        if: failure() && github.event.pull_request == null
+        if: failure() && github.ref == 'refs/heads/main'
         id: failed-build
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
