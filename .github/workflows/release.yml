@@ -5,12 +5,10 @@ name: Release
   schedule:
     - cron: 0 */2 * * *
   workflow_dispatch: {}
-  push:
-    branches-ignore:
-      - main
   pull_request:
-    branches:
-      - "*"
+    types:
+      - opened
+      - synchronize
 
 jobs:
   release:
