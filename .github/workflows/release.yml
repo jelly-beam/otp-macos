@@ -67,9 +67,6 @@ jobs:
         if: "${{github.ref == 'refs/heads/main' &&
              steps.config_build.outputs.target_commitish != ''}}"
 
-      - run:
-          exit 1  # Making it fail on purpose for testing purposes.
-
       - name: Notify on failed build
         uses: jayqi/failed-build-issue-action@1a893bbf43ef1c2a8705e2b115cd4f0fe3c5649b  # v1.2.0
         if: failure() && github.event.pull_request == null
