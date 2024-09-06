@@ -223,13 +223,22 @@ cd_kerl_dir
 kerl_build_install "${global_OTP_VSN}"
 echo "::endgroup::"
 
-kerl_test() {
+erl_test() {
     ./bin/erl -s crypto -s init stop
     ./bin/erl_call
+    local crypto
+    crypto=$(find . -name "crypto.so")
+    dyn=$(otool -L "${crypto}")
+    dyn=$(echo "${dyn}" | tail -n +2)
+    if [[ ${dyn} -ne "" ]]; then
+        echo "OpenSSL linking not static! Exiting..."
+        echo "::endgroup::"
+        exit 0
+    fi
 }
-echo "::group::kerl: test build result"
+echo "::group::erl: test build result"
 cd_install_dir
-kerl_test
+erl_test
 echo "::endgroup::"
 
 release_prepare() {
