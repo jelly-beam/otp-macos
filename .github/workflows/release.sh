@@ -163,13 +163,15 @@ pick_otp_vsn() {
     while read -r release; do
         if [[ ${release} =~ ^[0-9].*$ ]]; then
             local major=${release%%.*}
+            local minor=${release#*.}
+            minor=${minor%%.*}
             if [[ ${oldest_supported} == undefined ]]; then
                 echo "Couldn't determine oldest support version. Exiting..."
                 echo "::endgroup::"
                 exit 1
             fi
 
-            if [[ ${major} -lt ${oldest_supported} ]]; then
+            if [[ ${major} -lt ${oldest_supported} ]] || { [[ ${major} -eq 25 ]] && [[ ${minor} -lt 1 ]]; }; then
                 continue
             fi
 
