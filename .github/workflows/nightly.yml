@@ -32,8 +32,8 @@ jobs:
 
     strategy:
       matrix:
-        darwin64-vsn: ["12", "13", "14"]
-        otp-vsn: ["master", "maint"]  # The same as is_nightly_otp_for, in release.sh
+        darwin64-vsn: [12, 13, 14]
+        otp-vsn: [master, maint]  # The same as is_nightly_otp_for, in release.sh
       fail-fast: true
       max-parallel: 1
 
@@ -67,3 +67,10 @@ jobs:
           target_commitish: ${{steps.config_build.outputs.target_commitish}}
         if: "${{github.ref == 'refs/heads/main' &&
              steps.config_build.outputs.target_commitish != ''}}"
+
+      - name: Notify on failed build
+        uses: jayqi/failed-build-issue-action@1a893bbf43ef1c2a8705e2b115cd4f0fe3c5649b  # v1.2.0
+        if: failure() && github.ref == 'refs/heads/main'
+        id: failed-build
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
