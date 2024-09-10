@@ -5,16 +5,30 @@ name: Release
   schedule:
     - cron: 0 */2 * * *
   workflow_dispatch: {}
-  push:
-    branches-ignore:
-      - main
   pull_request:
-    branches:
-      - "*"
+    types:
+      - opened
+      - synchronize
 
 jobs:
+  branch:
+    outputs:
+      head_ref: ${{steps.branch.outputs.head_ref}}
+
+    runs-on: ubuntu-24.04
+
+    steps:
+      - id: branch
+        run: |
+          head_ref=${GITHUB_REF}
+          echo "head_ref is ${head_ref}"
+          [[ -z "${head_ref}" ]] && exit 1
+          echo "head_ref=${head_ref}" > "${GITHUB_OUTPUT}"
+
   release:
     name: Release
+
+    needs: [branch]
 
     strategy:
       matrix:
@@ -28,7 +42,7 @@ jobs:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332  # v4.1.7
         with:
           # We want jobs to always checkout the updated branch
-          ref: ${{github.ref_name}}
+          ref: ${{needs.branch.outputs.head_ref}}
 
       - name: Configure and build
         timeout-minutes: 60

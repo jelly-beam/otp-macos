@@ -124,6 +124,7 @@ kerl_configure() {
 
     export_kerl_configuration_option "--disable-dynamic-ssl-lib"
     local with_ssl
+    brew install openssl@3.0
     with_ssl="$(brew --prefix openssl@3.0)"
     export_kerl_configuration_option "--with-ssl=${with_ssl}"
 
@@ -163,13 +164,15 @@ pick_otp_vsn() {
     while read -r release; do
         if [[ ${release} =~ ^[0-9].*$ ]]; then
             local major=${release%%.*}
+            local minor=${release#*.}
+            minor=${minor%%.*}
             if [[ ${oldest_supported} == undefined ]]; then
                 echo "Couldn't determine oldest support version. Exiting..."
                 echo "::endgroup::"
                 exit 1
             fi
 
-            if [[ ${major} -lt ${oldest_supported} ]]; then
+            if [[ ${major} -lt ${oldest_supported} ]] || { [[ ${major} -eq 25 ]] && [[ ${minor} -lt 1 ]] || [[ ${minor} -eq "" ]]; }; then
                 continue
             fi
 
@@ -220,13 +223,22 @@ cd_kerl_dir
 kerl_build_install "${global_OTP_VSN}"
 echo "::endgroup::"
 
-kerl_test() {
+erl_test() {
     ./bin/erl -s crypto -s init stop
     ./bin/erl_call
+    local crypto
+    crypto=$(find . -name "crypto.so")
+    dyn=$(otool -L "${crypto}")
+    dyn=$(echo "${dyn}" | tail -n +2)
+    if [[ ${dyn} -ne "" ]]; then
+        echo "OpenSSL linking not static! Exiting..."
+        echo "::endgroup::"
+        exit 0
+    fi
 }
-echo "::group::kerl: test build result"
+echo "::group::erl: test build result"
 cd_install_dir
-kerl_test
+erl_test
 echo "::endgroup::"
 
 release_prepare() {
