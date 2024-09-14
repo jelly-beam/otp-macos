@@ -10,7 +10,7 @@
 It was initially created to support macOS on <https://github.com/erlef/setup-beam> builds.
 
 We aim to build all Erlang versions (at most one every 2 hours - for all OS versions) starting from
-Erlang/OTP 25.1, and targeting macOS for the versions supported by GitHub Actions (12, 13, and 14
+Erlang/OTP 25.1, and targeting macOS for the versions supported by GitHub Actions (13, and 14
 at the time of this writing).
 
 We also aim to build from `master` and `maint`, nightly, mostly to allow consumers to be on the
