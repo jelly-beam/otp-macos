@@ -34,7 +34,6 @@ jobs:
       matrix:
         darwin-vsn: ["13", "14"]
         otp-vsn: ["master", "maint"]  # The same as is_nightly_otp_for, in release.sh
-        arch: ["x64"]
       fail-fast: true
       max-parallel: 1
 
