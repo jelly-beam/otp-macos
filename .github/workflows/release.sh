@@ -201,12 +201,15 @@ pick_otp_vsn() {
         exit 0
     fi
 }
+pick_non_nightly_otp_vsn() {
+    global_IS_NIGHTLY_OTP=$(is_nightly_otp_for "${global_OTP_VSN}")
+    if [[ ${global_IS_NIGHTLY_OTP} == false ]]; then
+        pick_otp_vsn
+    fi
+}
 echo "::group::Erlang/OTP: pick version to build"
 cd_kerl_dir
-global_IS_NIGHTLY_OTP=$(is_nightly_otp_for "${global_OTP_VSN}")
-if [[ ${global_IS_NIGHTLY_OTP} == false ]]; then
-    pick_otp_vsn
-fi
+pick_non_nightly_otp_vsn
 echo "Picked OTP ${global_OTP_VSN}"
 echo "::endgroup::"
 
@@ -222,6 +225,13 @@ kerl_build_install() {
 echo "::group::kerl: build-install"
 cd_kerl_dir
 kerl_build_install "${global_OTP_VSN}"
+echo "::endgroup::"
+
+kerl_build_log() {
+    cat ~/.kerl/builds/"${global_OTP_VSN}"/otp_build_"${global_OTP_VSN}".log
+}
+echo "::group::kerl: build log"
+kerl_build_log
 echo "::endgroup::"
 
 erl_test() {
