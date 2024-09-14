@@ -59,6 +59,7 @@ different feel free to open an issue in this pull request so we can help investi
 Supported architectures are (from `${arch}`):
 
 - `x86_64`: a 64-bit Intel-based Mac
+- `arm64`: a 64-bit ARM-based Mac
 
 ### GitHub images
 
