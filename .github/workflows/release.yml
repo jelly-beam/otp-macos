@@ -32,7 +32,7 @@ jobs:
 
     strategy:
       matrix:
-        darwin-vsn: ["12", "13", "14"]
+        darwin-vsn: ["13", "14"]
         arch: ["x64"]
       fail-fast: true
       max-parallel: 1
