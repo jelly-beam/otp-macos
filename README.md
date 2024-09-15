@@ -51,8 +51,7 @@ to the tag, but notice the `_` instead of the `/`).
 
 Finally, we also include a `.sha256.txt` in releases, for consumers to verify the origin of the
 files. To do so, run `shasum -a 256 <file>` where `<file>` is the downloaded `.tar.gz` asset,
-then compare the result of that operation to `<file>`'s `.sha256.txt` counterpart. If they're
-different feel free to open an issue in this pull request so we can help investigate further.
+then compare the result of that operation to `<file>`'s `.sha256.txt` counterpart.
 
 #### Architectures
 
