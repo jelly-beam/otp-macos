@@ -244,7 +244,7 @@ erl_test() {
     if [[ ${dyn} -ne "" ]]; then
         echo "OpenSSL linking not static! Exiting..."
         echo "::endgroup::"
-        exit 0
+        exit 1
     fi
 }
 echo "::group::erl: test build result"
