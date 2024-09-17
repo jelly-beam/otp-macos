@@ -34,8 +34,10 @@ jobs:
         uses: ./.github/actions/get-branch
 
       - name: Build and release
+        timeout-minutes: 60
         uses: ./.github/actions/build-and-release
         with:
           head_ref: ${{steps.branch.outputs.head_ref}}
           darwin-vsn: ${{matrix.darwin-vsn}}
           otp-vsn: ${{matrix.otp-vsn}}
+          github-token: ${{secrets.GITHUB_TOKEN}}
