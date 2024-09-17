@@ -1,0 +1,17 @@
+---
+name: "Get branch"
+description: "Get the name of the branch running the action"
+
+outputs:
+  head_ref:
+    value: ${{steps.branch.outputs.head_ref}}
+
+runs:
+  using: "composite"
+  steps:
+    - id: branch
+      run: |
+        head_ref=${GITHUB_REF}
+        echo "head_ref is ${head_ref}"
+        [[ -z "${head_ref}" ]] && exit 1
+        echo "head_ref=${head_ref}" > "${GITHUB_OUTPUT}"

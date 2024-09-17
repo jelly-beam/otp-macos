@@ -1,0 +1,49 @@
+---
+name: "Build and release"
+description: "Build and release on identified inputs"
+
+inputs:
+  head_ref:
+    required: true
+  darwin-vsn:
+    required: true
+  otp-vsn:
+    default: undefined
+
+runs:
+  using: "composite"
+  steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332  # v4.1.7
+        with:
+          # We want jobs to always checkout the updated branch
+          ref: ${{inputs.head_ref}}
+
+      - name: Configure and build
+        timeout-minutes: 60
+        id: config_build
+        run: |
+          ./.github/workflows/release.sh ${{inputs.darwin-vsn}} ${{inputs.otp-vsn}}
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Release
+        uses: softprops/action-gh-release@c062e08bd532815e2082a85e87e3ef29c3e6d191  # v2.0.8
+        with:
+          body: >
+            This is
+            Erlang/OTP ${{steps.config_build.outputs.otp_vsn}} compiled for
+            Darwin ${{inputs.darwin-vsn}} (64 bit).
+          files: |
+            ${{steps.config_build.outputs.tar_gz}}
+            ${{steps.config_build.outputs.sha256_txt}}
+          tag_name: ${{steps.config_build.outputs.git_tag}}
+          target_commitish: ${{steps.config_build.outputs.target_commitish}}
+        if: "${{github.ref == 'refs/heads/main' &&
+             steps.config_build.outputs.target_commitish != ''}}"
+
+      - name: Notify on failed build
+        uses: jayqi/failed-build-issue-action@1a893bbf43ef1c2a8705e2b115cd4f0fe3c5649b  # v1.2.0
+        if: failure() && github.ref == 'refs/heads/main'
+        id: failed-build
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
