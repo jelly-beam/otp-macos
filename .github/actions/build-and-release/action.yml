@@ -13,11 +13,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332  # v4.1.7
-        with:
-          # We want jobs to always checkout the updated branch
-          ref: ${{inputs.head_ref}}
-
       - name: Configure and build
         timeout-minutes: 60
         id: config_build
