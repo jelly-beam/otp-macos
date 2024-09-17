@@ -3,8 +3,6 @@ name: "Build and release"
 description: "Build and release on identified inputs"
 
 inputs:
-  head_ref:
-    required: true
   darwin-vsn:
     required: true
   otp-vsn:

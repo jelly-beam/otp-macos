@@ -11,8 +11,22 @@ name: Nightly
       - synchronize
 
 jobs:
+  branch:
+    outputs:
+      head_ref: ${{steps.branch.outputs.head_ref}}
+
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332  # v4.1.7
+
+      - id: branch
+        uses: ./.github/actions/get-branch
+
   release:
     name: Nightly
+
+    needs: [branch]
 
     strategy:
       matrix:
@@ -27,17 +41,12 @@ jobs:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332  # v4.1.7
         with:
           # We want jobs to always checkout the updated branch
-          ref: ${{inputs.head_ref}}
-
-      - name: Get branch
-        id: branch
-        uses: ./.github/actions/get-branch
+          ref: ${{needs.branch.outputs.head_ref}}
 
       - name: Build and release
         timeout-minutes: 60
         uses: ./.github/actions/build-and-release
         with:
-          head_ref: ${{steps.branch.outputs.head_ref}}
           darwin-vsn: ${{matrix.darwin-vsn}}
           otp-vsn: ${{matrix.otp-vsn}}
           github-token: ${{secrets.GITHUB_TOKEN}}
