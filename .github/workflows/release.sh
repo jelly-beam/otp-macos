@@ -173,7 +173,7 @@ pick_otp_vsn() {
                 exit 1
             fi
 
-            if [[ ${major} -lt ${oldest_supported} ]] || { [[ ${major} -eq 25 ]] && [[ ${minor} -lt 1 ]] || [[ ${minor} -eq "" ]]; }; then
+            if [[ ${major} -lt ${oldest_supported} ]] || { [[ ${major} -eq 25 ]] && { [[ ${minor} -lt 1 ]] || [[ -z ${minor} ]]; }; }; then
                 continue
             fi
 
