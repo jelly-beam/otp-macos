@@ -15,3 +15,4 @@ runs:
         echo "head_ref is ${head_ref}"
         [[ -z "${head_ref}" ]] && exit 1
         echo "head_ref=${head_ref}" > "${GITHUB_OUTPUT}"
+      shell: bash
