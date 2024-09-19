@@ -180,11 +180,10 @@ pick_otp_vsn() {
             local filename_no_ext
             filename_no_ext=$(filename_no_ext_for "${release}")
 
-            if ! grep -qE "^${filename_no_ext}$" .DONT_BUILD; then
+            pushd "${global_INITIAL_DIR}" >/dev/null || exit 1
+            if grep -qE "^${filename_no_ext}$" .DONT_BUILD; then
                 continue
             fi
-
-            pushd "${global_INITIAL_DIR}" >/dev/null || exit 1
             if [[ -f _RELEASES ]]; then
                 local found
                 found=$(grep "${filename_no_ext} " _RELEASES)
