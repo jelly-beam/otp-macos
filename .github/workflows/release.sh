@@ -132,6 +132,7 @@ kerl_configure() {
 
     export_kerl_configuration_option "--disable-dynamic-ssl-lib"
     local with_ssl
+    brew install coreutils
     brew install openssl@3.0
     with_ssl="$(brew --prefix openssl@3.0)"
     export_kerl_configuration_option "--with-ssl=${with_ssl}"
@@ -223,12 +224,6 @@ pick_non_nightly_otp_vsn
 echo "Picked OTP ${global_OTP_VSN}"
 echo "::endgroup::"
 
-sha256sum() {
-    local openssl_sha256
-    openssl_sha256=$(openssl sha256 "$@")
-
-    echo "${openssl_sha256}" | awk '{print $2}'
-}
 kerl_build_install() {
     # $1: OTP version
 
