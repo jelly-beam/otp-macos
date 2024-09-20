@@ -6,6 +6,13 @@ global_OTP_VSN=$2
 global_INSTALL_DIR=${RUNNER_TEMP}/otp
 global_ARCH=$(uname -m)
 
+# Maybe enable debug with GitHub
+
+if [[ "${RUNNER_DEBUG}" == "1" ]]; then
+    export PS4='+ ${LINENO}: '
+    set -x
+fi
+
 # Helper functions
 
 cd_install_dir() {
