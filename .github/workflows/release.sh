@@ -6,6 +6,13 @@ global_OTP_VSN=$2
 global_INSTALL_DIR=${RUNNER_TEMP}/otp
 global_ARCH=$(uname -m)
 
+# Maybe enable debug with GitHub
+
+if [[ "${RUNNER_DEBUG}" == "1" ]]; then
+    export PS4='+ ${LINENO}: '
+    set -x
+fi
+
 # Helper functions
 
 cd_install_dir() {
@@ -125,6 +132,7 @@ kerl_configure() {
 
     export_kerl_configuration_option "--disable-dynamic-ssl-lib"
     local with_ssl
+    brew install coreutils
     brew install openssl@3.0
     with_ssl="$(brew --prefix openssl@3.0)"
     export_kerl_configuration_option "--with-ssl=${with_ssl}"
