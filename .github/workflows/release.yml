@@ -30,7 +30,7 @@ jobs:
 
     strategy:
       matrix:
-        darwin-vsn: ["13", "14"]
+        darwin-vsn: ["13", "14", "15"]
 
         # otp-vsn is picked later
       fail-fast: true
