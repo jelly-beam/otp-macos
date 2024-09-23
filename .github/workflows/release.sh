@@ -85,7 +85,7 @@ is_nightly_otp_for() {
     # $1: OTP version
 
     local nightly_otp_targets
-    nightly_otp_targets=("master" "maint")
+    nightly_otp_targets=("master" "maint" "maint-25" "maint-26" "maint-27")
     if [[ ${nightly_otp_targets[*]} =~ $1 ]]; then
         echo true
     else

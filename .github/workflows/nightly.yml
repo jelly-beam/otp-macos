@@ -31,7 +31,8 @@ jobs:
     strategy:
       matrix:
         darwin-vsn: ["13", "14"]
-        otp-vsn: ["master", "maint"]  # The same as is_nightly_otp_for, in release.sh
+        # The same as is_nightly_otp_for, in release.sh
+        otp-vsn: ["master", "maint", "maint-25", "maint-26", "maint-27"]
       fail-fast: true
       max-parallel: 1
 

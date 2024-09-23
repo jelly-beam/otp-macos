@@ -13,10 +13,12 @@ We aim to build all Erlang versions (at most one every 2 hours - for all OS vers
 Erlang/OTP 25.1, and targeting macOS for the versions supported by GitHub Actions (13, and 14
 at the time of this writing).
 
-We also aim to build from `master` and `maint`, nightly, mostly to allow consumers to be on the
+We also aim to build from `master` and `maint[-*]`, nightly, mostly to allow consumers to be on the
 edge, but also to test potential upcoming issues with the image build/release pipeline. These
 versions will remain in (moving target) branches with their copy of `_RELEASES`, but won't see
 an update for their version in the main branch's `_RELEASES`.
+
+**Note**: `[-*]` is either `""` or `-<supported_version>`.
 
 ## The build/release pipeline
 
